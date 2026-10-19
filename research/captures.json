@@ -1,0 +1,370 @@
+[
+  {
+    "name": "spec-intro",
+    "url": "https://personalagentprotocol.org/docs/spec",
+    "rect": {
+      "x": 538,
+      "y": 142,
+      "width": 772,
+      "height": 734.234375
+    },
+    "rects": [
+      {
+        "x": 554,
+        "y": 158,
+        "w": 407.484375,
+        "h": 41.390625,
+        "text": "Personal Agent Protocol"
+      },
+      {
+        "x": 554,
+        "y": 243.390625,
+        "w": 740,
+        "h": 32.5,
+        "text": "1Introduction"
+      },
+      {
+        "x": 554,
+        "y": 804.140625,
+        "w": 740,
+        "h": 56.09375,
+        "text": "This is draft version 0.1. Any part of it can change before a stable version, including in ways that aren't backward compatible. Areas it doesn't cover yet are listed in Path to 1.0."
+      }
+    ],
+    "title": "Personal Agent Protocol specification (draft)"
+  },
+  {
+    "name": "spec-discovery",
+    "url": "https://personalagentprotocol.org/docs/spec",
+    "rect": {
+      "x": 538,
+      "y": 2438.4375,
+      "width": 772,
+      "height": 194.140625
+    },
+    "rects": [
+      {
+        "x": 554,
+        "y": 2454.4375,
+        "w": 740,
+        "h": 61.5,
+        "text": "3Discovery"
+      },
+      {
+        "x": 554,
+        "y": 2532.4375,
+        "w": 740,
+        "h": 84.140625,
+        "text": "A Company MUST publish its poppy.json document at https://{domain}/.well-known/poppy.json over HTTPS, where {domain} is the Company's domain or a subdomain it controls."
+      }
+    ],
+    "title": "Personal Agent Protocol specification (draft)"
+  },
+  {
+    "name": "spec-scopes",
+    "url": "https://personalagentprotocol.org/docs/spec",
+    "rect": {
+      "x": 538,
+      "y": 16774.609375,
+      "width": 772,
+      "height": 348.046875
+    },
+    "rects": [
+      {
+        "x": 554,
+        "y": 16790.609375,
+        "w": 740,
+        "h": 26.34375,
+        "text": "Scopes"
+      },
+      {
+        "x": 554,
+        "y": 16833.453125,
+        "w": 740,
+        "h": 28.046875,
+        "text": "Scopes say what account access a sign-in grants. The protocol defines two broad scopes:"
+      },
+      {
+        "x": 554,
+        "y": 16790.609375,
+        "w": 740,
+        "h": 26.34375,
+        "text": "Scopes"
+      },
+      {
+        "x": 576,
+        "y": 17022.515625,
+        "w": 718,
+        "h": 84.140625,
+        "text": "The scopes are independent: request poppy:read poppy:write when both are needed. Companies decide which operations require each scope and enforce them across web browsing, APIs, and actions performed by the Company Agent."
+      }
+    ],
+    "title": "Personal Agent Protocol specification (draft)"
+  },
+  {
+    "name": "spec-direct",
+    "url": "https://personalagentprotocol.org/docs/spec",
+    "rect": {
+      "x": 538,
+      "y": 18601.25,
+      "width": 772,
+      "height": 661.171875
+    },
+    "rects": [
+      {
+        "x": 554,
+        "y": 18617.25,
+        "w": 740,
+        "h": 24.6875,
+        "text": "4.5 Direct Sign-In"
+      },
+      {
+        "x": 554,
+        "y": 19134.234375,
+        "w": 740,
+        "h": 112.1875,
+        "text": "2. The User signs in and approves. The Company's page shows which Personal Agent is asking, using the name and logo from its metadata document. The User signs in however the Company allows, such as a password, a passkey, or a provider like Google or Apple. The page shows the requested scopes and lets the User approve some or all of them, or decline."
+      }
+    ],
+    "title": "Personal Agent Protocol specification (draft)"
+  },
+  {
+    "name": "spec-session",
+    "url": "https://personalagentprotocol.org/docs/spec",
+    "rect": {
+      "x": 538,
+      "y": 7263.40625,
+      "width": 772,
+      "height": 322.828125
+    },
+    "rects": [
+      {
+        "x": 554,
+        "y": 7279.40625,
+        "w": 740,
+        "h": 61.5,
+        "text": "4Sessions and authorization"
+      },
+      {
+        "x": 554,
+        "y": 7542.1875,
+        "w": 740,
+        "h": 28.046875,
+        "text": "The protocol uses two kinds of token:"
+      }
+    ],
+    "title": "Personal Agent Protocol specification (draft)"
+  },
+  {
+    "name": "draft-head",
+    "url": "https://sierra.ai/blog/poppy",
+    "rect": {
+      "x": 228,
+      "y": 248,
+      "width": 1144,
+      "height": 408
+    },
+    "rects": [
+      {
+        "x": 244,
+        "y": 264,
+        "w": 1112,
+        "h": 48,
+        "text": "Sharing a draft of Personal Agent Protocol"
+      },
+      {
+        "x": 598.65625,
+        "y": 376,
+        "w": 757.34375,
+        "h": 48,
+        "text": "Since announcing this new protocol on Tuesday with Meta and Genesys, Instinct, NiCE, Rocket, Shopify, Stripe, and Walmart, the response has been overwhelming."
+      },
+      {
+        "x": 598.65625,
+        "y": 448,
+        "w": 757.34375,
+        "h": 192,
+        "text": "So today we’re publishing a draft of Personal Agent Protocol, known as Poppy, and announcing an additional 35 design partners: Adyen, Atomic, Bank of America, BBVA, Chime, Cigna, Cloudflare, Comcast, DIRECTV, ElevenLabs, FOX, Gap Inc., GEICO, Hertz, Insurify, Klaviyo, Liberty Mutual, Mastercard, Nordstrom, Notion, Okta, OneSignal, OpenAI, PayPal, Plaid, SiriusXM, Synchrony, Target, United Airlines, Venmo, Visa, Wells Fargo, Zapier, Zendesk, and 1Password. These companies will participate in the design process for the draft Personal Agent Protocol, contributing valuable feedback from their unique business perspectives."
+      }
+    ],
+    "title": "Sharing a draft of Personal Agent Protocol | Sierra"
+  },
+  {
+    "name": "path-open",
+    "url": "https://personalagentprotocol.org/docs/path-to-1",
+    "rect": {
+      "x": 538,
+      "y": 1554.796875,
+      "width": 772,
+      "height": 390.921875
+    },
+    "rects": [
+      {
+        "x": 554,
+        "y": 1570.796875,
+        "w": 740,
+        "h": 61.5,
+        "text": "Open topics"
+      },
+      {
+        "x": 554,
+        "y": 1648.796875,
+        "w": 740,
+        "h": 84.140625,
+        "text": "These are larger areas the draft doesn't cover yet, listed so it's clear they are left out on purpose and not overlooked. The list isn't complete, and other gaps will come up as people implement the protocol."
+      },
+      {
+        "x": 576,
+        "y": 1749.4375,
+        "w": 718,
+        "h": 56.09375,
+        "text": "Payments. How a personal agent makes payments in a way that fits the protocol, including how that works with existing payment protocols."
+      },
+      {
+        "x": 576,
+        "y": 1811.53125,
+        "w": 718,
+        "h": 56.09375,
+        "text": "Push notifications. How a company reaches the personal agent when no request is open, for example when an order ships or a person replies hours later."
+      },
+      {
+        "x": 576,
+        "y": 1873.625,
+        "w": 718,
+        "h": 56.09375,
+        "text": "Attachments. How company messages carry more than text and data, such as receipts, return labels, product images, or forms for the user to fill in."
+      }
+    ],
+    "title": "Personal Agent Protocol: Path to 1.0"
+  },
+  {
+    "name": "extensions",
+    "url": "https://personalagentprotocol.org/docs/extensions",
+    "rect": {
+      "x": 538,
+      "y": 142,
+      "width": 772,
+      "height": 323.125
+    },
+    "rects": [
+      {
+        "x": 554,
+        "y": 243.390625,
+        "w": 740,
+        "h": 32.5,
+        "text": "What extensions are"
+      },
+      {
+        "x": 554,
+        "y": 292.390625,
+        "w": 740,
+        "h": 84.140625,
+        "text": "Extensions add optional features on top of the specification. Each one solves a problem that some companies and personal agents have and others don't, so it stays out of the core protocol that everyone implements."
+      },
+      {
+        "x": 554,
+        "y": 393.03125,
+        "w": 740,
+        "h": 56.09375,
+        "text": "Supporting an extension is always optional. A personal agent or company that doesn't support one ignores it, and the two sides still work together under the specification alone."
+      },
+      {
+        "x": 554,
+        "y": 158,
+        "w": 186.046875,
+        "h": 41.390625,
+        "text": "Extensions"
+      }
+    ],
+    "title": "Personal Agent Protocol: Extensions"
+  },
+  {
+    "name": "ops-intro",
+    "url": "https://personalagentprotocol.org/docs/extensions/operations",
+    "rect": {
+      "x": 538,
+      "y": 227.390625,
+      "width": 772,
+      "height": 490.609375
+    },
+    "rects": [
+      {
+        "x": 554,
+        "y": 243.390625,
+        "w": 740,
+        "h": 32.5,
+        "text": "1Introduction"
+      },
+      {
+        "x": 554,
+        "y": 292.390625,
+        "w": 740,
+        "h": 112.1875,
+        "text": "The operations extension lets a Company ask the Personal Agent to confirm an action before the Company performs it, and gives both sides one record of that action. It suits actions with a business effect, such as exchanging an item, changing a booking, or cancelling a subscription. It guarantees three things:"
+      },
+      {
+        "x": 576,
+        "y": 421.078125,
+        "w": 718,
+        "h": 56.09375,
+        "text": "Approval covers the exact terms. The User approves one revision of the terms, and the Company performs only what that revision describes."
+      },
+      {
+        "x": 576,
+        "y": 483.171875,
+        "w": 718,
+        "h": 56.09375,
+        "text": "One record across channels. The action has one operation ID, whether it came up in an API call, an MCP tool, a conversation, or a web page."
+      },
+      {
+        "x": 576,
+        "y": 545.265625,
+        "w": 718,
+        "h": 28.046875,
+        "text": "At most once. Retrying after a timeout never performs the action twice."
+      },
+      {
+        "x": 554,
+        "y": 589.8125,
+        "w": 740,
+        "h": 112.1875,
+        "text": "The extension is optional, and a Company can use it for some actions and not others. It doesn't replace a Company's APIs. An endpoint, tool, or Company Agent that would perform an action proposes an operation instead, and the Personal Agent confirms it at one operations endpoint:"
+      }
+    ],
+    "title": "Personal Agent Protocol: Operations extension"
+  },
+  {
+    "name": "ops-trust",
+    "url": "https://personalagentprotocol.org/docs/extensions/operations",
+    "rect": {
+      "x": 538,
+      "y": 10088.25,
+      "width": 772,
+      "height": 406.96875
+    },
+    "rects": [
+      {
+        "x": 554,
+        "y": 10104.25,
+        "w": 740,
+        "h": 61.5,
+        "text": "8What a confirmation proves"
+      },
+      {
+        "x": 554,
+        "y": 10182.25,
+        "w": 740,
+        "h": 112.1875,
+        "text": "A confirmation shows that a specific Personal Agent, holding the Session's key, in a specific Session and account, stated that the User approved a specific revision of the terms, when, and how. Because revisions can't change, the Company knows exactly which terms that statement covers."
+      },
+      {
+        "x": 554,
+        "y": 10310.9375,
+        "w": 740,
+        "h": 168.28125,
+        "text": "It doesn't prove that the User saw the terms or approved them. The Company can't see the Personal Agent's interface, so approved_by works on trust, like the sign-in types (spec 4.4). A Company MAY revoke the client_id of a Personal Agent that confirms without the approval it claims. A Company that needs proof of the User's approval for an action can ask the User to approve on its own website, signed in, the way Direct Sign-In works. This extension doesn't define that step."
+      }
+    ],
+    "title": "Personal Agent Protocol: Operations extension"
+  }
+]

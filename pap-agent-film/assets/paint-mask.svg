@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 60" preserveAspectRatio="none">
+  <defs>
+    <filter id="rough" x="-12%" y="-40%" width="124%" height="180%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.16" numOctaves="2" seed="11" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="10" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+  <g filter="url(#rough)"><rect x="4" y="9" width="592" height="42" fill="#fff"/></g>
+  <g fill="#000">
+    <ellipse cx="92" cy="19" rx="10" ry="3.2"/>
+    <ellipse cx="232" cy="45" rx="13" ry="2.6"/>
+    <ellipse cx="376" cy="17" rx="8" ry="2.2"/>
+    <ellipse cx="520" cy="41" rx="11" ry="3"/>
+    <rect x="152" y="9" width="6" height="42"/>
+    <rect x="452" y="9" width="4" height="42"/>
+  </g>
+</svg>

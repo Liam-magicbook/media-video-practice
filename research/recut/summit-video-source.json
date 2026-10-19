@@ -1,0 +1,83 @@
+{
+  "tweet": "https://x.com/SierraPlatform/status/2108245197440307584",
+  "variant": {
+    "bitrate": 10368000,
+    "content_type": "video/mp4",
+    "url": "https://video.twimg.com/amplify_video/2108243099877281792/vid/avc1/1920x1080/GZ1IZykQ6nMVbzJJ.mp4"
+  },
+  "metadata": {
+    "additional_media_info": {},
+    "display_url": "pic.x.com/7k4b9nfyIn",
+    "expanded_url": "https://x.com/SierraPlatform/status/2108245197440307584/video/1",
+    "ext_media_availability": {
+      "status": "Available"
+    },
+    "indices": [
+      208,
+      231
+    ],
+    "media_url_https": "https://pbs.twimg.com/amplify_video_thumb/2108243099877281792/img/uu9XLc5jcgIzFp3Z.jpg",
+    "original_info": {
+      "focus_rects": [],
+      "height": 1080,
+      "width": 1920
+    },
+    "sizes": {
+      "large": {
+        "h": 1080,
+        "resize": "fit",
+        "w": 1920
+      },
+      "medium": {
+        "h": 675,
+        "resize": "fit",
+        "w": 1200
+      },
+      "small": {
+        "h": 383,
+        "resize": "fit",
+        "w": 680
+      },
+      "thumb": {
+        "h": 150,
+        "resize": "crop",
+        "w": 150
+      }
+    },
+    "type": "video",
+    "url": "https://t.co/7k4b9nfyIn",
+    "video_info": {
+      "aspect_ratio": [
+        16,
+        9
+      ],
+      "duration_millis": 196563,
+      "variants": [
+        {
+          "content_type": "application/x-mpegURL",
+          "url": "https://video.twimg.com/amplify_video/2108243099877281792/pl/0qJNo258XXcUz1o7.m3u8?v=d90"
+        },
+        {
+          "bitrate": 256000,
+          "content_type": "video/mp4",
+          "url": "https://video.twimg.com/amplify_video/2108243099877281792/vid/avc1/480x270/QKhEFVSKj25Qu4FU.mp4"
+        },
+        {
+          "bitrate": 832000,
+          "content_type": "video/mp4",
+          "url": "https://video.twimg.com/amplify_video/2108243099877281792/vid/avc1/640x360/w7ikMnO0cnulOwYJ.mp4"
+        },
+        {
+          "bitrate": 2176000,
+          "content_type": "video/mp4",
+          "url": "https://video.twimg.com/amplify_video/2108243099877281792/vid/avc1/1280x720/bmFhXMNa2WGnWPKD.mp4"
+        },
+        {
+          "bitrate": 10368000,
+          "content_type": "video/mp4",
+          "url": "https://video.twimg.com/amplify_video/2108243099877281792/vid/avc1/1920x1080/GZ1IZykQ6nMVbzJJ.mp4"
+        }
+      ]
+    }
+  }
+}

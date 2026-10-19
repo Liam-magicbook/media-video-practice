@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 的数学稿，Lean 检查了什么？ · v2</title>
+<style>
+@font-face{font-family:'Alibaba PuHuiTi';src:url('assets/fonts/AlibabaPuHuiTi-3-115-Black.woff2') format('woff2');font-weight:1000;font-display:block}
+@font-face{font-family:'Alibaba PuHuiTi';src:url('assets/fonts/AlibabaPuHuiTi-3-105-Heavy.woff2') format('woff2');font-weight:900;font-display:block}
+@font-face{font-family:'Alibaba PuHuiTi';src:url('assets/fonts/AlibabaPuHuiTi-3-85-Bold.woff2') format('woff2');font-weight:700;font-display:block}
+@font-face{font-family:'Alibaba PuHuiTi';src:url('assets/fonts/AlibabaPuHuiTi-3-65-Medium.woff2') format('woff2');font-weight:500;font-display:block}
+@font-face{font-family:'Alibaba PuHuiTi';src:url('assets/fonts/AlibabaPuHuiTi-3-55-Regular.woff2') format('woff2');font-weight:400;font-display:block}
+@font-face{font-family:'Inter';src:url('assets/fonts/Inter-VF.ttf') format('truetype');font-weight:100 900;font-display:block}
+@font-face{font-family:'JetBrains Mono';src:url('assets/fonts/JetBrainsMono-VF.ttf') format('truetype');font-weight:100 800;font-display:block}
+@font-face{font-family:'Chakra Petch';src:url('assets/fonts/ChakraPetch-SemiBold.ttf') format('truetype');font-weight:600;font-display:block}
+@font-face{font-family:'Cormorant Garamond';src:url('assets/fonts/CormorantGaramond-VF.ttf') format('truetype');font-weight:300 700;font-display:block}
+@font-face{font-family:'Noto Serif SC';src:url('assets/fonts/NotoSerifSC-VF.ttf') format('truetype');font-weight:200 900;font-display:block}
+
+  :root{--paper:#E9EEF2;--ink:#25313D;--muted:#7C8B99;--orange:#FF5A36;--green:#2F7D5A;--red:#D6452F;--tape:#F2C14E;--white:#F7F9FB;--display:'Inter',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0E141A;color:var(--ink);font-family:'Alibaba PuHuiTi',sans-serif;overflow:hidden}
+  #wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+  #stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;background:var(--paper);box-shadow:0 30px 90px #000a}
+  #world{position:absolute;left:0;top:0;width:2400px;height:7200px;transform-origin:0 0;
+    background-color:var(--paper);
+    background-image:radial-gradient(circle,#C5CFD8 2.2px,transparent 2.9px),radial-gradient(120% 90% at 30% 30%,#F4F6F8 0%,#E9EEF2 55%,#DDE4EA 100%);
+    background-size:48px 48px,100% 100%;background-position:0 0}
+  section{position:absolute;left:40px;width:2360px;height:1000px}
+  .zh{font-family:'Alibaba PuHuiTi',sans-serif}
+  .num{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+  .serif{font-family:'Cormorant Garamond','Noto Serif SC',"STSong",serif}
+  .kicker{display:none!important;position:absolute;left:180px;top:46px;align-items:center;gap:14px;font:600 18px/1 'JetBrains Mono',monospace;letter-spacing:.12em;color:var(--muted)}
+  .kicker i{display:block;width:12px;height:12px;background:var(--orange)}
+  .label{position:absolute;font:500 15px/1.4 'JetBrains Mono',monospace;letter-spacing:.08em;color:var(--muted)}
+  .rule{position:absolute;height:2px;background:var(--ink);transform-origin:0 50%}
+  .rule.o{background:var(--orange)}
+  .sticker{position:absolute;background:#fff;padding:13px;border-radius:9px;box-shadow:0 28px 60px rgba(22,34,46,.22);transform-origin:50% 50%}
+  .sticker img{display:block;width:100%;border-radius:2px}
+  .cap{position:absolute;left:2px;top:-26px;font:500 13px/1 'JetBrains Mono',monospace;color:var(--muted);white-space:nowrap}
+  .hl{position:absolute;border:0!important;background:url('assets/paint-stroke.png') center/100% 100% no-repeat!important;pointer-events:none;mix-blend-mode:multiply;transform:rotate(-.45deg);filter:saturate(1.05)}
+  .tape{position:absolute;width:82px;height:24px;background:url('assets/textures/washi.png') center/cover;opacity:.9;transform:rotate(-6deg);box-shadow:0 3px 8px rgba(22,34,46,.12);mix-blend-mode:multiply}
+  .stamp{position:absolute;border:6px solid var(--red);color:var(--red);padding:12px 22px;font:800 30px/1 'Alibaba PuHuiTi',sans-serif;letter-spacing:.08em;background:rgba(233,238,242,.75);transform-origin:50% 50%}
+  .card{position:absolute;background:rgba(255,255,255,.55);border-radius:6px}
+  .num-big{font-family:var(--display);font-weight:700;letter-spacing:-.04em;line-height:.9}
+  .sub{position:absolute;left:50%;bottom:52px;transform:translateX(-50%);font:500 30px/1.4 'Alibaba PuHuiTi',sans-serif;color:var(--ink);white-space:nowrap;background:rgba(233,238,242,.92);padding:8px 18px;border-radius:4px;box-shadow:0 8px 24px rgba(22,34,46,.10)}
+  .sub b{color:var(--orange);font-weight:700}
+  #vig{position:absolute;inset:0;pointer-events:none;z-index:1;background:radial-gradient(ellipse at 42% 38%,rgba(255,255,255,0) 55%,rgba(33,45,55,.10) 100%)}
+  #papertex{position:absolute;inset:0;pointer-events:none;opacity:.14;mix-blend-mode:multiply;z-index:1;background:url('assets/textures/paper.jpg') center/cover}
+  #grain{position:absolute;inset:0;pointer-events:none;opacity:.12;mix-blend-mode:overlay;z-index:1;background:url('assets/textures/grain.png') center/512px repeat}
+  #ink{position:absolute;inset:0;pointer-events:none;opacity:.12;mix-blend-mode:multiply;z-index:1;background:url('assets/ink.png') center/cover}
+  #dust{position:absolute;inset:0;pointer-events:none;opacity:.07;mix-blend-mode:screen;z-index:1;background:url('assets/textures/dust.png') center/cover}
+  .macro{position:relative;overflow:hidden;background:#0D1412;border:1px solid #33443B}
+  .macro img{position:absolute;image-rendering:pixelated;filter:contrast(1.12) saturate(1.06)}
+  .macro:after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.055) 0 1px,transparent 1px 3px)}
+  .idepanel{position:absolute;background:#101916;border:1px solid #33443B;border-radius:8px;box-shadow:0 28px 60px rgba(10,16,14,.26);overflow:hidden}
+  .evcard{position:absolute;background:rgba(255,255,255,.66);border-radius:6px;box-shadow:0 18px 42px rgba(22,34,46,.18);overflow:hidden}
+  .evcard.g{border-top:3px solid var(--green)}
+  .evcard.r{border-top:3px solid var(--red)}
+  .papercard{position:absolute;background:#fff;border-radius:5px;box-shadow:0 24px 55px rgba(22,34,46,.16);overflow:hidden}
+  .codecard{position:absolute;background:#18231F;border:1px solid #33443B;border-radius:8px;box-shadow:0 28px 60px rgba(10,16,14,.26);overflow:hidden}
+  .termcard{position:absolute;background:#121C18;border:1px solid #2F6B4B;border-radius:8px;box-shadow:0 28px 60px rgba(10,16,14,.26);overflow:hidden}
+  .codehead{position:absolute;left:0;right:0;top:0;height:34px;background:#0E1613;display:flex;align-items:center;padding:0 13px;gap:5px;color:#8FA39A;font:500 11px/1 'JetBrains Mono'}
+  .codehead i{display:block;width:7px;height:7px;border-radius:50%;background:#3C4B44}
+  .codehead span{margin-left:8px}
+  #s0-grid i{aspect-ratio:1;background:rgba(37,49,61,.10);border-radius:2px}
+  #s0-grid i.on{background:var(--orange)}
+  .rail{position:absolute;height:0;transform-origin:0 50%;pointer-events:none}
+  .marker{position:absolute;background:linear-gradient(90deg,rgba(255,90,54,.03),rgba(255,90,54,.18) 14%,rgba(255,90,54,.18) 86%,rgba(255,90,54,.03));border-radius:3px;transform:rotate(-1.4deg) skewX(-4deg);z-index:0;pointer-events:none}
+  .torn{clip-path:polygon(0 3%,2% 0,98% 1%,100% 4%,99% 96%,97% 100%,2% 99%,0 95%)}
+  #topbar{position:absolute;left:0;top:0;right:0;height:86px;background:linear-gradient(#E9EEF2 0%,#E9EEF2 58%,rgba(233,238,242,0) 100%);z-index:2;pointer-events:none}
+  #hud{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none;z-index:3}
+  #sub{z-index:3}
+  #hud .brand{position:absolute;left:54px;top:30px;font:700 22px/1 'Alibaba PuHuiTi',sans-serif;color:var(--ink)}
+  #hud .brand i{display:inline-block;width:13px;height:13px;background:var(--orange);margin-right:10px;vertical-align:-1px}
+  #hud .brand small{font:600 14px/1 'Chakra Petch',sans-serif;letter-spacing:.14em;color:var(--muted);margin-left:14px}
+  #hud .ch{position:absolute;right:54px;top:32px;font:600 14px/1 'Chakra Petch',sans-serif;letter-spacing:.1em;color:var(--muted)}
+  #hud .bar{position:absolute;left:54px;right:54px;bottom:22px;height:3px;background:#C5CFD8}
+  #hud .bar i{display:block;height:3px;background:var(--orange);width:0}
+  #ctl{position:fixed;left:0;right:0;bottom:0;height:50px;display:flex;align-items:center;gap:12px;padding:0 16px;background:#0B1014;color:#DDE3E7;font:12px/1 'Alibaba PuHuiTi',sans-serif;z-index:20}
+  #ctl button{background:#172127;color:#E7ECEF;border:1px solid #2C3B44;border-radius:999px;padding:6px 12px;font:12px 'Alibaba PuHuiTi',sans-serif;cursor:pointer}
+  #ctl button:hover{border-color:#5A7280}
+  #ctl input{flex:1;accent-color:var(--orange)}
+  #ctl .t{font:500 12px/1 'JetBrains Mono',monospace;color:#9FB0BB;min-width:128px;text-align:right}
+</style>
+</head>
+<body>
+<div id="wrap"><div id="stage"><div id="world">
+
+  <section id="s0">
+    <div class="kicker" id="s0-k"><i></i>OPENAI MATH / 2026.10.06</div>
+    <div class="zh" id="s0-t" style="position:absolute;left:180px;top:132px;font:900 46px/1.1 'Alibaba PuHuiTi';color:var(--muted)">一次公开，</div>
+    <div class="num-big" id="s0-n" style="position:absolute;left:180px;top:200px;font-size:240px;color:var(--ink)">0</div>
+    <div class="zh" id="s0-u" style="position:absolute;left:620px;top:330px;font:800 44px/1 'Alibaba PuHuiTi';color:var(--ink)">篇 AI 数学稿</div>
+    <div id="s0-fam" style="position:absolute;left:180px;top:520px;font:700 64px/1 'Inter';color:var(--green)">372 <span style="font:600 26px/1 'Alibaba PuHuiTi';color:var(--muted)">个结果族</span></div>
+
+    <div id="s0-grid" style="position:absolute;left:1100px;top:220px;width:414px;display:grid;grid-template-columns:repeat(10,1fr);gap:6px"></div>
+    <div class="num-big" id="s0-p" style="position:absolute;left:1600px;top:224px;font-size:96px;color:var(--orange)">0%</div>
+    <div class="label" id="s0-pl" style="left:1600px;top:338px;width:400px;font-size:14px;line-height:1.6">TOP-LINE RESULTS<br>WITH LEAN FORMALIZATION</div>
+    <div class="label" style="left:1100px;top:650px;color:var(--muted)">42 / 100 · 形式化覆盖</div>
+
+    <div class="sticker" id="s0-x" style="left:1760px;top:620px;width:300px" data-rot="2">
+      <img src="assets/x-openai.png" alt="">
+      <div class="cap">X / @OPENAI · 10.07</div>
+    </div>
+
+    <div class="sticker" id="s0-r" style="left:180px;top:640px;width:1240px" data-rot="-1">
+      <img src="assets/readme-719-strip.png" alt="" style="width:100%;display:block">
+      <div class="hl" style="left:1%;top:26%;width:97%;height:48%"></div>
+      <div class="cap">GITHUB / OPENAI/MATH · README 2026.10.12</div>
+    </div>
+
+    <img id="s0-hand" src="assets/manicule.png" alt="" style="position:absolute;left:1452px;top:690px;width:190px;opacity:0;transform:scaleX(-1) rotate(-7deg);z-index:2">
+    <div class="zh" id="s0-q" style="position:absolute;left:200px;top:812px;font:900 58px/1.28 'Alibaba PuHuiTi';color:var(--ink);opacity:0">Lean 通过<br><span style="color:var(--orange)">≠ 数学成立</span></div>
+    <svg id="s0-scribble" width="2400" height="1000" style="position:absolute;left:0;top:0;pointer-events:none">
+      <path d="M190 976 C360 962 560 990 760 970" stroke="#FF5A36" stroke-width="7" fill="none" stroke-linecap="round" stroke-dasharray="620" stroke-dashoffset="620"/>
+    </svg>
+  </section>
+
+  <section id="s1" style="top:0;left:2440px">
+    <div class="kicker" id="s1-k"><i></i>机制 / 翻译链</div>
+    <div class="zh" id="s1-t" style="position:absolute;left:180px;top:90px;font:900 56px/1 'Alibaba PuHuiTi';color:var(--ink)">被折叠的一步</div>
+    <div class="label" id="s1-s" style="left:180px;top:160px;opacity:0">自然语言 → 形式化 → 编译检查</div>
+
+    <div class="num" style="position:absolute;left:1640px;top:70px;font:900 300px/1 var(--display);color:rgba(37,49,61,.045);z-index:0">02</div>
+
+    <div class="papercard" id="s1-c1" style="left:180px;top:250px;width:540px;height:470px">
+      <div class="tape" style="left:26px;top:-11px;transform:rotate(-6deg)"></div>
+      <div class="label" style="left:24px;top:20px;color:var(--muted)">01 / 原话</div>
+      <div class="zh" style="position:absolute;left:24px;top:52px;font:900 40px/1 'Alibaba PuHuiTi';color:var(--ink)">自然语言</div>
+      <div class="zh" style="position:absolute;left:24px;top:104px;font:500 19px/1.4 'Alibaba PuHuiTi';color:#5E6D7B">作者写下的命题与论证</div>
+      <div style="position:absolute;left:18px;top:160px;width:2px;height:150px;background:rgba(214,69,47,.55)"></div>
+      <div class="zh serif" style="position:absolute;left:38px;top:164px;font:700 30px/1.55 'Cormorant Garamond','Noto Serif SC';color:var(--ink)">“这一步，<br>究竟在说什么？”</div>
+      <div style="position:absolute;left:38px;top:300px;right:24px">
+        <div style="height:1px;background:#CBD5DE;margin:0 0 18px"></div>
+        <div style="height:1px;background:#CBD5DE;margin:0 0 18px"></div>
+        <div style="height:1px;background:#CBD5DE;margin:0 0 18px"></div>
+        <div style="height:1px;background:#CBD5DE"></div>
+      </div>
+      <div class="zh" style="position:absolute;left:24px;bottom:22px;font:700 18px/1 'Alibaba PuHuiTi';color:var(--orange)">原话的含义，不在编译器里</div>
+    </div>
+
+    <div class="codecard" id="s1-c2" style="left:840px;top:250px;width:540px;height:470px">
+      <div class="codehead"><i></i><i></i><i></i><span>proof.lean</span></div>
+      <div class="label" style="left:24px;top:52px;color:#8FA39A">02 / LEAN</div>
+      <div class="zh" style="position:absolute;left:24px;top:82px;font:900 38px/1 'Alibaba PuHuiTi';color:#EAF2EC">形式化</div>
+      <div class="zh" style="position:absolute;left:24px;top:132px;font:500 18px/1.4 'Alibaba PuHuiTi';color:#8FA39A">把命题翻译成编译器能读的代码</div>
+      <div class="num" id="s1-code" style="position:absolute;left:24px;top:206px;font:500 19px/1.85 'JetBrains Mono';color:#D8E6DC;clip-path:inset(0 100% 0 0)"><span style="color:#54665C">1</span>  theorem foo : P := by<br><span style="color:#54665C">2</span>  <span style="color:#7FE3A8">exact h</span><br><span style="color:#54665C">3</span>  <span style="color:#6F857A">-- 只在这里成立</span></div>
+      <div class="stamp" id="s1-s2" style="right:20px;bottom:20px;font-size:17px;padding:7px 11px;border-width:4px;opacity:0">语义 ≠ 等价</div>
+    </div>
+
+    <div class="termcard" id="s1-c3" style="left:1500px;top:250px;width:540px;height:470px">
+      <div class="codehead"><i></i><i></i><i></i><span>lean --check</span></div>
+      <div class="label" style="left:24px;top:52px;color:#7FE3A8">03 / CHECK</div>
+      <div class="zh" style="position:absolute;left:24px;top:82px;font:900 38px/1 'Alibaba PuHuiTi';color:#EAF2EC">编译器</div>
+      <div class="zh" style="position:absolute;left:24px;top:132px;font:500 18px/1.4 'Alibaba PuHuiTi';color:#8FA39A">只处理写进形式系统的内容</div>
+      <div class="num" id="s1-check" style="position:absolute;left:24px;top:196px;font:700 108px/1 'JetBrains Mono';color:#7FE3A8;opacity:0">✓</div>
+      <div class="zh" style="position:absolute;left:152px;top:252px;font:700 27px/1.2 'Alibaba PuHuiTi';color:#7FE3A8">0 errors<br><span style="font-size:20px;color:#B7D8C6">推导闭合</span></div>
+      <div class="zh" style="position:absolute;left:24px;bottom:22px;font:500 16px/1.4 'Alibaba PuHuiTi';color:#6F857A">不管原话究竟想说什么</div>
+    </div>
+
+    <svg id="s1-lines" width="2400" height="1000" style="position:absolute;left:0;top:0;pointer-events:none">
+      <path d="M720 410 L840 410" stroke="#FF5A36" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="140" stroke-dashoffset="140"/>
+      <path d="M1380 410 L1500 410" stroke="#FF5A36" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="140" stroke-dashoffset="140"/>
+      <path d="M840 780 L2040 780" stroke="#D6452F" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="1300" stroke-dashoffset="1300"/>
+    </svg>
+    <div id="s1-gap" style="position:absolute;left:750px;top:250px;width:60px;height:470px;opacity:0;transform-origin:50% 50%;pointer-events:none">
+      <svg width="60" height="470" viewBox="0 0 60 470" preserveAspectRatio="none" style="overflow:visible">
+        <path d="M31 2 L23 44 L34 86 L25 128 L33 170 L24 212 L32 254 L26 296 L34 338 L25 380 L31 422 L27 468" stroke="#D6452F" stroke-width="15" fill="none" stroke-linecap="round" opacity=".07"/>
+        <path d="M31 2 L23 44 L34 86 L25 128 L33 170 L24 212 L32 254 L26 296 L34 338 L25 380 L31 422 L27 468" stroke="#D6452F" stroke-width="4" fill="none" stroke-linecap="round" opacity=".95"/>
+      </svg>
+      <div class="label" style="left:-18px;top:474px;width:96px;text-align:center;font-size:10px;letter-spacing:.18em;color:var(--red)">SEMANTIC<br>GAP</div>
+    </div>
+    <div id="s1-hl" style="position:absolute;left:198px;top:310px;width:500px;height:82px;background:rgba(242,193,78,.22);transform-origin:0 0;opacity:0;pointer-events:none"></div>
+    <div class="rail" id="s1-r1" style="left:180px;top:760px;width:660px;border-top:2px dashed var(--red);opacity:0"></div>
+    <div class="rail" id="s1-r2" style="left:840px;top:760px;width:540px;border-top:2px solid var(--orange);opacity:0"></div>
+    <div class="rail" id="s1-r3" style="left:1380px;top:760px;width:660px;border-top:2px solid var(--green);opacity:0"></div>
+    <div class="label" id="s1-rl1" style="left:180px;top:786px;color:var(--red);opacity:0">语义对应 · 人</div>
+    <div class="label" id="s1-rl2" style="left:900px;top:786px;color:var(--orange);opacity:0">翻译</div>
+    <div class="label" id="s1-rl3" style="left:1380px;top:786px;color:var(--green);opacity:0">推导 · 机器检查</div>
+    <div class="zh" id="s1-note" style="position:absolute;left:1380px;top:852px;font:700 18px/1 'Alibaba PuHuiTi';color:var(--green);opacity:0">这里只保证内部一致</div>
+    <div class="zh" id="s1-note2" style="position:absolute;left:180px;top:852px;font:700 18px/1 'Alibaba PuHuiTi';color:var(--orange);opacity:0">原话的含义，不在编译器里</div>
+  </section>
+
+  <section id="s2" style="top:1120px;left:2440px">
+    <div class="kicker" id="s2-k"><i></i>教学演示 / LEAN 4</div>
+    <div class="zh" id="s2-t" style="position:absolute;left:180px;top:86px;font:900 52px/1.1 'Alibaba PuHuiTi';color:var(--ink)">一段代码，两个“完成”</div>
+    <div class="label" id="s2-sub" style="left:180px;top:152px">XENA PROJECT 教学演示 · 非 OPENAI 材料</div>
+
+    <div class="idepanel" id="s2-img" style="left:180px;top:220px;width:1000px;height:520px;opacity:0">
+      <div class="codehead"><i></i><i></i><i></i><span>proof.lean</span></div>
+      <div style="position:absolute;left:0;top:34px;right:0;bottom:0;overflow:hidden">
+        <img src="assets/lean-sorry.jpg" alt="" style="width:100%;display:block">
+        <div class="hl" id="s2-hl" style="left:10%;top:25%;width:5.2%;height:5%;opacity:0"></div>
+      </div>
+      <div class="cap">LEAN 4 / XENA PROJECT</div>
+    </div>
+
+    <div class="evcard g" id="s2-card1" style="left:1300px;top:220px;width:620px;height:230px;opacity:0">
+      <div class="label" style="left:20px;top:16px;color:var(--green)">01 / 目标栏</div>
+      <div class="num" style="position:absolute;left:20px;top:56px;font:600 32px/1 'JetBrains Mono';color:var(--green)">goals accomplished</div>
+      <div class="num" style="position:absolute;right:24px;top:48px;font:700 46px/1 'JetBrains Mono';color:var(--green)">✓</div>
+      <div class="zh" style="position:absolute;left:20px;bottom:16px;font:700 18px/1.2 'Alibaba PuHuiTi';color:var(--green)">机器显示：完成</div>
+    </div>
+
+    <div class="evcard r" id="s2-card2" style="left:1300px;top:490px;width:620px;height:230px;opacity:0">
+      <div class="label" style="left:20px;top:16px;color:var(--red)">02 / 代码 · 第 7 行</div>
+      <div class="num" style="position:absolute;left:20px;top:54px;font:600 70px/1 'JetBrains Mono';color:var(--red)">sorry</div>
+      <div class="rule" style="left:20px;top:140px;width:320px;background:var(--red);height:3px"></div>
+      <div class="zh" style="position:absolute;left:20px;bottom:16px;font:700 18px/1.2 'Alibaba PuHuiTi';color:var(--red)">先跳过没写完的证明</div>
+    </div>
+
+    <svg id="s2-lead" width="2400" height="1000" style="position:absolute;left:0;top:0;pointer-events:none">
+      <path id="s2-p1" d="M915 306 L1285 300" stroke="#2F7D5A" stroke-width="2.5" fill="none" stroke-dasharray="380" stroke-dashoffset="380" opacity=".9"/>
+      <path id="s2-p2" d="M290 390 C700 390 900 590 1285 590" stroke="#FF5A36" stroke-width="2.5" fill="none" stroke-dasharray="1050" stroke-dashoffset="1050" opacity=".95"/>
+      <circle cx="915" cy="306" r="4" fill="#2F7D5A"/><circle cx="290" cy="390" r="4" fill="#FF5A36"/>
+    </svg>
+    <div class="label" id="s2-l1" style="left:980px;top:284px;color:var(--green);opacity:0">目标栏</div>
+    <div class="label" id="s2-l2" style="left:720px;top:500px;color:var(--orange);opacity:0">第 7 行</div>
+    <div class="zh" id="s2-conc" style="position:absolute;left:180px;top:800px;font:900 56px/1.1 'Alibaba PuHuiTi';color:var(--ink);opacity:0">编译通过 <span style="color:var(--orange)">≠</span> 证明完成</div>
+    <div class="label" id="s2-note" style="left:180px;top:880px;color:var(--muted);opacity:0">目标栏显示“完成”，不等于证明完成</div>
+  </section>
+
+  <section id="s3" style="top:1120px;left:40px">
+    <div class="kicker" id="s3-k"><i></i>证据 / ARXIV 2610.08144</div>
+    <div class="zh" id="s3-t" style="position:absolute;left:180px;top:86px;font:900 52px/1.1 'Alibaba PuHuiTi';color:var(--ink)">同一天，另一篇论文</div>
+    <div class="label" id="s3-s" style="left:180px;top:152px">BASTOUNIS / CIRCELLI / HANSEN · 2026.10.06</div>
+
+    <div class="sticker" id="s3-img" style="left:180px;top:180px;width:1120px" data-rot="0.7">
+      <div class="tape" style="left:30px;top:-12px;transform:rotate(-5deg)"></div>
+      <div class="tape" style="right:36px;top:-13px;transform:rotate(6deg)"></div>
+      <img src="assets/arxiv.png" alt="">
+      <div class="hl" style="left:1.4%;top:12.1%;width:73.8%;height:5.8%;border-color:#D6452F;background:rgba(242,193,78,.14)"></div>
+      <div class="hl" id="s3-hl2" style="left:2.5%;top:40.4%;width:78%;height:4.4%;border-color:#D6452F;background:rgba(242,193,78,.28);opacity:0"></div>
+      <div style="position:absolute;right:13px;top:13px;width:18.5%;height:calc(100% - 26px);background:#fff"></div>
+      <div style="position:absolute;left:13px;right:13px;bottom:13px;height:20%;background:linear-gradient(transparent,#fff 55%)"></div>
+      <div class="cap">ARXIV / 摘要页 · 原题</div>
+    </div>
+
+    <div class="card torn" id="s3-quote" style="left:180px;top:820px;width:1120px;height:104px;background:#fff;box-shadow:0 18px 40px rgba(22,34,46,.18);opacity:0">
+      <div class="tape" style="left:22px;top:-12px;transform:rotate(-5deg)"></div>
+      <div class="num" style="position:absolute;left:22px;top:18px;font:500 17px/1.55 'JetBrains Mono';color:var(--ink)">we show that the formalised Lean proof does not<br>correspond to the NL proof of blow-up …</div>
+      <div class="rule o" style="left:22px;top:80px;width:520px"></div>
+    </div>
+
+    <div class="zh serif" id="s3-en" style="position:absolute;left:1540px;top:230px;font:700 52px/1.16 'Cormorant Garamond','Noto Serif SC';color:var(--ink);opacity:0">Navier–Stokes<br><span style="color:var(--green)">lost in translation</span></div>
+    <div class="zh" id="s3-cn" style="position:absolute;left:1540px;top:380px;font:600 26px/1.5 'Alibaba PuHuiTi';color:var(--ink);opacity:0">Lean 验证，不保证<br>自然语言证明正确</div>
+    <div class="stamp" id="s3-stamp" style="left:1600px;top:650px;opacity:0">不裁定原证明</div>
+    <div class="zh" id="s3-note" style="position:absolute;left:1540px;top:760px;font:500 18px/1.5 'Alibaba PuHuiTi';color:var(--muted);opacity:0">论文指出翻译环节的风险，<br>不据此判定原证明本身。</div>
+    <div class="rule o" id="s3-r" style="left:1540px;top:210px;width:460px;transform:scaleX(0)"></div>
+  </section>
+
+  <section id="s4" style="top:2240px;left:40px">
+    <div class="kicker" id="s4-k"><i></i>独立报道 / 数学界</div>
+    <div class="zh" id="s4-t" style="position:absolute;left:180px;top:86px;font:900 52px/1.1 'Alibaba PuHuiTi';color:var(--ink)">差异，不等于推翻</div>
+    <div class="label" id="s4-s" style="left:180px;top:152px">TECHCRUNCH · 2026.10.08</div>
+
+    <div class="sticker" id="s4-img" style="left:180px;top:200px;width:980px" data-rot="-1.0">
+      <div style="position:relative;height:270px;overflow:hidden">
+        <img src="assets/tc-05.jpg" style="position:absolute;left:0;top:-400px;width:100%">
+        <div class="hl" style="left:15.6%;top:54px;width:45.1%;height:52px;border-color:#D6452F;background:rgba(242,193,78,.14)"></div>
+        <div class="hl" id="s4-hl2" style="left:33.8%;top:72px;width:23.2%;height:13px;border-color:#C98A12;background:rgba(242,193,78,.30);opacity:0"></div>
+        <div style="position:absolute;right:0;top:0;width:36%;height:100%;background:#fff"></div>
+      </div>
+      <div class="cap">TECHCRUNCH / 原文段落</div>
+    </div>
+
+    <div id="s4-mid" style="position:absolute;left:1160px;top:520px;font:900 46px/1.35 'Alibaba PuHuiTi',sans-serif;color:var(--orange);opacity:0">不能只靠模型，<br>给自己的证明<br>做形式化。</div>
+    <div class="card" id="s4-q1" style="left:1120px;top:170px;width:820px;height:250px;background:rgba(255,255,255,.55);opacity:0">
+      <div class="tape" style="left:30px;top:-12px"></div>
+      <div class="label" style="left:26px;top:24px;color:var(--orange)">TERENCE TAO / 陶哲轩 · 转述</div>
+      <div class="zh serif" style="position:absolute;left:26px;top:66px;font:700 32px/1.45 'Cormorant Garamond','Noto Serif SC';color:var(--ink)">解决一个目标就离开，<br>答不了同行的提问。</div>
+      <div class="label" style="left:26px;bottom:18px;font-size:12px">个人观点，不代表数学界共识</div>
+    </div>
+
+    <div class="card" id="s4-q2" style="left:1120px;top:480px;width:820px;height:250px;background:rgba(255,255,255,.55);opacity:0">
+      <div class="tape" style="left:30px;top:-12px"></div>
+      <div class="label" style="left:26px;top:24px;color:var(--green)">AGMAI / 顾问组</div>
+      <div class="zh serif" style="position:absolute;left:26px;top:66px;font:700 32px/1.45 'Cormorant Garamond','Noto Serif SC';color:var(--ink)">最终由数学共同体判断：<br>建议落实了多少。</div>
+      <div class="label" style="left:26px;bottom:18px;font-size:12px">九位研究者 · 2026 年 9 月</div>
+    </div>
+
+    <div class="num" id="s4-neq" style="position:absolute;left:920px;top:700px;font:700 84px/1 'JetBrains Mono';color:var(--orange);opacity:0">≠</div>
+    <div class="zh" id="s4-nl" style="position:absolute;left:920px;top:800px;font:700 20px/1.3 'Alibaba PuHuiTi';color:var(--muted);opacity:0">差异 ≠ 推翻<br>但 ≠ 可以自证</div>
+  </section>
+
+  <section id="s5" style="top:2240px;left:2440px">
+    <div class="kicker" id="s5-k"><i></i>修订记录 / 2026.10.07</div>
+    <div class="zh" id="s5-t" style="position:absolute;left:180px;top:58px;font:900 52px/1.1 'Alibaba PuHuiTi';color:var(--ink)">结果还在动</div>
+    <div class="label" id="s5-s" style="left:180px;top:112px">HISTORY.MD / 三篇撤回 · 十四篇修订</div>
+
+    <div id="s5-mount" style="position:absolute;left:156px;top:130px;width:566px;height:338px;background:url('assets/kraft.jpg') center/cover;transform:rotate(-3.4deg);box-shadow:0 22px 44px rgba(22,34,46,.18);opacity:0"></div>
+    <div class="sticker" id="s5-smf" style="left:180px;top:150px;width:520px" data-rot="-2.6">
+      <img src="assets/smf-title.jpg" alt="">
+      <div class="cap">SMF 公开讲座 / 2026</div>
+    </div>
+
+    <div class="sticker" id="s5-h" style="left:760px;top:150px;width:860px" data-rot="0.8">
+      <div class="tape" style="left:30px;top:-12px;transform:rotate(-4deg)"></div>
+      <img src="assets/history.png" alt="">
+      <div class="hl" style="left:25.3%;top:66.6%;width:64%;height:5.8%;border-color:#D6452F;background:rgba(242,193,78,.18)"></div>
+      <div class="hl" style="left:25.3%;top:55.5%;width:22%;height:8.5%;border-color:#D6452F;background:rgba(242,193,78,.10)"></div>
+      <div class="cap">GITHUB / OPENAI/MATH / HISTORY.MD</div>
+    </div>
+
+    <div class="rail" id="s5-rail" style="left:180px;top:710px;width:1660px;border-top:2px solid #CBD5DE;opacity:0"></div>
+    <div id="s5-d1" style="position:absolute;left:294px;top:704px;width:14px;height:14px;border-radius:50%;background:var(--orange);opacity:0"></div>
+    <div id="s5-d2" style="position:absolute;left:1094px;top:704px;width:14px;height:14px;border-radius:50%;background:var(--red);opacity:0"></div>
+    <div id="s5-d3" style="position:absolute;left:1594px;top:704px;width:14px;height:14px;border-radius:50%;background:var(--green);opacity:0"></div>
+    <div class="label" id="s5-t1" style="left:270px;top:724px;opacity:0">10.06 发布</div>
+    <div class="label" id="s5-t2" style="left:1070px;top:724px;opacity:0">10.07 撤回 3 · 修订 14</div>
+    <div class="label" id="s5-t3" style="left:1570px;top:724px;opacity:0">之后 继续更新</div>
+    <div class="num" id="s5-n1" style="position:absolute;left:180px;top:800px;font:700 76px/1 var(--display);color:var(--red);opacity:0">3</div>
+    <div class="label" id="s5-l1" style="left:250px;top:822px;opacity:0">篇撤回</div>
+    <div class="num" id="s5-n2" style="position:absolute;left:420px;top:800px;font:700 76px/1 var(--display);color:#C98A12;opacity:0">14</div>
+    <div class="label" id="s5-l2" style="left:510px;top:822px;opacity:0">篇修订</div>
+    <div class="num" id="s5-n3" style="position:absolute;left:680px;top:800px;font:700 76px/1 var(--display);color:var(--green);opacity:0">+6</div>
+    <div class="label" id="s5-l3" style="left:800px;top:822px;opacity:0">个形式化</div>
+    <div class="num" id="s5-n4" style="position:absolute;left:1010px;top:800px;font:700 64px/1 var(--display);color:var(--green);opacity:0">300/719</div>
+    <div class="label" id="s5-l4" style="left:1290px;top:822px;opacity:0">已形式化</div>
+
+    <div class="num" id="s5-cot" style="position:absolute;left:1800px;top:220px;font:700 64px/1 var(--display);color:var(--ink);opacity:0">10<span style="color:var(--muted);font-size:30px"> / 719</span></div>
+    <div class="label" id="s5-cotl" style="left:1800px;top:292px;opacity:0">只有 10 篇公开思维链</div>
+    <div class="stamp" id="s5-stamp" style="left:1700px;top:760px;font-size:26px;opacity:0">NOT LEAN</div>
+  </section>
+
+  <section id="s6" style="top:3360px;left:2440px;height:1100px">
+    <div class="kicker" id="s6-k"><i></i>结论 / 三处核对</div>
+    <div class="zh" id="s6-t" style="position:absolute;left:180px;top:80px;font:900 52px/1.1 'Alibaba PuHuiTi';color:var(--ink)">Lean 能保证什么？</div>
+    <div class="label" id="s6-s" style="left:180px;top:146px">形式系统内，有一个合法推导</div>
+
+    <div class="card" id="s6-table" style="left:180px;top:210px;width:900px;height:330px;background:rgba(255,255,255,.55);opacity:0">
+      <div class="num" style="position:absolute;left:26px;top:24px;font:700 28px/1.4 'JetBrains Mono';color:var(--ink)">A ⇒ B　给定</div>
+      <div class="num" style="position:absolute;left:26px;top:92px;font:700 28px/1.4 'JetBrains Mono';color:var(--ink)">B ⇒ C　给定</div>
+      <div class="num" style="position:absolute;left:26px;top:160px;font:700 28px/1.4 'JetBrains Mono';color:var(--ink)">A ⇒ C　推出</div>
+      <div style="position:absolute;left:24px;right:24px;top:66px;height:1px;background:#CBD5DE"></div>
+      <div style="position:absolute;left:24px;right:24px;top:134px;height:1px;background:#CBD5DE"></div>
+      <div class="num" style="position:absolute;right:26px;bottom:18px;font:700 42px/1 'JetBrains Mono';color:var(--green)">✓</div>
+      <div class="zh" style="position:absolute;right:90px;bottom:24px;font:700 20px/1 'Alibaba PuHuiTi';color:var(--green)">合法推导</div>
+    </div>
+
+    <div class="zh" id="s6-cap" style="position:absolute;left:1160px;top:210px;font:700 22px/1 'Alibaba PuHuiTi';color:var(--muted)">不能保证</div>
+    <div class="card" id="s6-i1" style="left:1160px;top:260px;width:720px;height:70px;background:rgba(255,255,255,.42);opacity:0"><span class="zh" style="position:absolute;left:20px;top:18px;font:700 30px/1 'Alibaba PuHuiTi';color:var(--ink)">× 忠实表达原问题</span></div>
+    <div class="card" id="s6-i2" style="left:1160px;top:345px;width:720px;height:70px;background:rgba(255,255,255,.42);opacity:0"><span class="zh" style="position:absolute;left:20px;top:18px;font:700 30px/1 'Alibaba PuHuiTi';color:var(--ink)">× 结果新颖、重要</span></div>
+    <div class="card" id="s6-i3" style="left:1160px;top:430px;width:720px;height:70px;background:rgba(255,255,255,.42);opacity:0"><span class="zh" style="position:absolute;left:20px;top:18px;font:700 30px/1 'Alibaba PuHuiTi';color:var(--ink)">× 已被同行复核</span></div>
+
+    <div class="label" id="s6-big" style="left:180px;top:590px;color:var(--muted);opacity:0">NEXT / 三处核对</div>
+    <div class="marker" id="s6-m" style="left:168px;top:640px;width:330px;height:70px;opacity:0"></div>
+    <div class="zh" id="s6-big2" style="position:absolute;left:180px;top:625px;font:900 72px/1.1 'Alibaba PuHuiTi';color:var(--orange);opacity:0">先看三处</div>
+
+    <div class="num" id="s6-n1" style="position:absolute;left:180px;top:700px;font:900 64px/1 var(--display);color:var(--muted);opacity:0">01</div>
+    <div class="num" id="s6-n2" style="position:absolute;left:760px;top:700px;font:900 64px/1 var(--display);color:var(--muted);opacity:0">02</div>
+    <div class="num" id="s6-n3" style="position:absolute;left:1340px;top:700px;font:900 64px/1 var(--display);color:var(--muted);opacity:0">03</div>
+    <div class="rail" id="s6-l1" style="left:180px;top:748px;width:520px;border-top:2px solid #CBD5DE;opacity:0"></div>
+    <div class="rail" id="s6-l2" style="left:760px;top:748px;width:520px;border-top:2px solid #CBD5DE;opacity:0"></div>
+    <div class="rail" id="s6-l3" style="left:1340px;top:748px;width:520px;border-top:2px solid #CBD5DE;opacity:0"></div>
+    <div id="s6-c1" class="card" style="left:180px;top:760px;width:520px;height:250px;background:rgba(255,255,255,.6);opacity:0">
+      <div style="position:absolute;left:14px;top:14px;right:14px;height:160px;overflow:hidden;border-radius:4px"><img src="assets/arxiv.png" style="width:100%;display:block;margin-top:-10%"></div>
+      <div class="label" style="left:14px;bottom:52px;color:var(--orange)">01 / 语义</div>
+      <div class="zh" style="position:absolute;left:14px;bottom:18px;font:700 26px/1 'Alibaba PuHuiTi'">它形式化了哪句话</div>
+    </div>
+    <div id="s6-c2" class="card" style="left:760px;top:760px;width:520px;height:250px;background:rgba(255,255,255,.6);opacity:0">
+      <div style="position:absolute;left:14px;top:14px;right:14px;height:160px;overflow:hidden;border-radius:4px"><img src="assets/lean-sorry.jpg" style="width:100%;display:block"></div>
+      <div class="label" style="left:14px;bottom:52px;color:var(--orange)">02 / 检查</div>
+      <div class="zh" style="position:absolute;left:14px;bottom:18px;font:700 26px/1 'Alibaba PuHuiTi'">Lean 真的检查了什么</div>
+    </div>
+    <div id="s6-c3" class="card" style="left:1340px;top:760px;width:520px;height:250px;background:rgba(255,255,255,.6);opacity:0">
+      <div style="position:absolute;left:14px;top:14px;right:14px;height:160px;overflow:hidden;border-radius:4px"><img src="assets/smf-timeline.jpg" style="width:100%;display:block"></div>
+      <div class="label" style="left:14px;bottom:52px;color:var(--orange)">03 / 共同体</div>
+      <div class="zh" style="position:absolute;left:14px;bottom:18px;font:700 26px/1 'Alibaba PuHuiTi'">数学家有没有接手</div>
+    </div>
+  </section>
+
+</div>
+  <div id="vig"></div>
+  <div id="papertex"></div>
+  <div id="grain"></div>
+  <div id="ink"></div>
+  <div id="dust"></div>
+  <div id="topbar"></div>
+  <div id="sub" class="sub"></div>
+  <div id="hud">
+    <div class="brand"><i></i>科技观察<small>OPENAI MATH / LEAN 边界</small></div>
+    <div class="ch" id="ch">01 / 04</div>
+    <div class="bar"><i id="bar"></i></div>
+  </div>
+</div></div>
+<div id="ctl">
+  <button id="play">暂停</button>
+  <button id="replay">重播</button>
+  <input id="seek" type="range" min="0" max="107.4" step="0.01" value="0">
+  <span class="t" id="clock">00:00.0 / 01:47.4</span>
+  <button id="sound">开启旁白</button>
+</div>
+<audio id="voice" src="narration.wav" preload="auto"></audio>
+<script src="timeline.js"></script>
+<script>
+const CUES=window.CUES, DUR=window.__DUR||107.423;
+const world=document.getElementById('world'),stage=document.getElementById('stage');
+const $=id=>document.getElementById(id);
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const ease=x=>{x=clamp(x);return x*x*(3-2*x)};
+const lerp=(a,b,p)=>a+(b-a)*p;
+const CAM=[
+ {t:0,x:1240,y:500,z:.92},{t:15.8,x:1240,y:500,z:.92},{t:16.1,x:1240,y:500,z:.92},{t:17.3,x:3640,y:500,z:.92},
+ {t:25.4,x:3640,y:500,z:.92},{t:26.9,x:3640,y:1620,z:.92},{t:36.0,x:3640,y:1620,z:.92},
+ {t:37.5,x:1240,y:1620,z:.92},{t:52.8,x:1240,y:1620,z:.92},{t:54.3,x:1240,y:2740,z:.92},
+ {t:68.0,x:1240,y:2740,z:.92},{t:69.5,x:3640,y:2740,z:.92},{t:88.9,x:3640,y:2740,z:.92},
+ {t:90.4,x:3640,y:3920,z:.92},{t:107.4,x:3640,y:3920,z:.92}
+];
+function cam(t){
+ if(t<=CAM[0].t)return {x:CAM[0].x||1200,y:CAM[0].y,z:CAM[0].z};
+ for(let i=1;i<CAM.length;i++){
+  const a=CAM[i-1],b=CAM[i];
+  if(t<=b.t){const p=ease((t-a.t)/(b.t-a.t));return {x:lerp(a.x||1200,b.x||1200,p),y:lerp(a.y,b.y,p),z:lerp(a.z,b.z,p)}}
+ }
+ return {x:CAM[CAM.length-1].x||1200,y:CAM[CAM.length-1].y,z:CAM[CAM.length-1].z};
+}
+function show(id,t,start,dur=.6,dy=18){
+ const el=$(id);if(!el)return;const p=ease(clamp((t-start)/dur));
+ el.style.opacity=p;el.style.transform=`translateY(${(1-p)*dy}px)`;
+}
+function sticker(id,t,land,rot=0,amp=.16){
+ const el=$(id);if(!el)return;const q=(t-(land-.24))/.24;
+ if(q<0){el.style.opacity=0;el.style.transform=`rotate(${rot}deg) scale(${1+amp})`;return}
+ if(q<1){const L=1-q*q;el.style.opacity=Math.min(1,q*4);el.style.transform=`rotate(${rot+4*L}deg) scale(${1+amp*L})`;return}
+ const dt=t-land,w=Math.exp(-9*dt)*Math.cos(2*Math.PI*4.2*dt);
+ el.style.opacity=1;el.style.transform=`rotate(${rot-.7*w}deg) scale(${1-.025*w})`;
+}
+function ruleIn(id,t,start,dur=.7){const el=$(id);if(!el)return;const p=ease(clamp((t-start)/dur));el.style.transform=`scaleX(${p})`}
+function wipe(id,t,start,dur=.7){const el=$(id);if(!el)return;const p=ease(clamp((t-start)/dur));el.style.opacity=Math.min(1,p*3);el.style.clipPath=`inset(0 ${100*(1-p)}% 0 0)`}
+function count(id,t,start,dur,to,suffix=''){const el=$(id);if(!el)return;const p=ease(clamp((t-start)/dur));el.textContent=Math.round(to*p)+suffix}
+
+function s0(t){
+ count('s0-n',t,.4,1.3,719);
+ show('s0-t',t,.2,.7);show('s0-u',t,1.6,.6);show('s0-fam',t,2.0,.6);
+ sticker('s0-x',t,1.3,2);sticker('s0-r',t,4.6,-1);
+ const hp=ease(clamp((t-4.8)/.5))*(1-ease(clamp((t-13.6)/.5)));$('s0-hand').style.opacity=hp;
+ const g=$('s0-grid');if(!g.dataset.built){for(let i=0;i<100;i++)g.appendChild(document.createElement('i'));g.dataset.built='1'}
+ const n=Math.round(42*ease(clamp((t-9.8)/1.2)));
+ for(let i=0;i<100;i++)g.children[i].classList.toggle('on',i<42&&i<n);
+ count('s0-p',t,9.8,1.2,42,'%');show('s0-pl',t,9.9,.6);
+ const sp=ease(clamp((t-14.5)/.8));$('s0-scribble').querySelector('path').style.strokeDashoffset=String(620*(1-sp));
+ show('s0-q',t,13.95,.7,24);
+}
+function s1(t){
+ show('s1-t',t,17.5,.7);show('s1-k',t,17.4,.6);show('s1-s',t,17.9,.6);
+ const p1=ease(clamp((t-17.6)/.7)),p2=ease(clamp((t-18.2)/.7)),p3=ease(clamp((t-20.7)/.8)),g=ease(clamp((t-23.8)/.7));
+ const c1=$('s1-c1'),c2=$('s1-c2'),c3=$('s1-c3');
+ c1.style.opacity=p1;c1.style.transform=`translateY(${(1-p1)*70}px) translateX(${-26*g}px) rotate(${-.5*(1-p1)}deg)`;
+ c2.style.opacity=p2;c2.style.transform=`translateY(${(1-p2)*50}px) translateX(${26*g}px) rotate(${.4*(1-p2)}deg)`;
+ c3.style.opacity=p3;c3.style.transform=`scale(${.92+.08*p3}) rotate(${-.3*(1-p3)}deg)`;
+ const gapEl=$('s1-gap');gapEl.style.opacity=g;gapEl.style.transform=`scaleX(${g})`;
+ const hl=$('s1-hl');hl.style.opacity=g*.75;hl.style.transform=`rotate(-1deg) scaleX(${g})`;
+ const ty=ease(clamp((t-18.6)/1.5));$('s1-code').style.clipPath=`inset(0 ${100*(1-ty)}% 0 0)`;
+ $('s1-check').style.opacity=ease(clamp((t-20.9)/.7));
+ const a1=ease(clamp((t-18.6)/.7)),a2=ease(clamp((t-21.1)/.7)),a3=ease(clamp((t-24.0)/.9));
+ const paths=document.querySelectorAll('#s1-lines path');
+ paths[0].style.strokeDashoffset=String(140*(1-a1));
+ paths[1].style.strokeDashoffset=String(140*(1-a2));
+ paths[2].style.strokeDashoffset=String(1300*(1-a3));
+ const rp=ease(clamp((t-23.8)/.8));['s1-r1','s1-r2','s1-r3'].forEach(id=>{const el=$(id);el.style.opacity=1;el.style.transform=`scaleX(${rp})`});['s1-rl1','s1-rl2','s1-rl3'].forEach(id=>{$(id).style.opacity=rp});
+ show('s1-note',t,24.2,.6);show('s1-note2',t,24.4,.6);show('s1-s2',t,24.0,.5);
+}
+function s2(t){
+ show('s2-t',t,27.0,.7);show('s2-k',t,26.9,.6);show('s2-sub',t,27.2,.6);
+ show('s2-img',t,27.3,.7);show('s2-card1',t,27.5,.7);
+ show('s2-card2',t,30.8,.7);$('s2-hl').style.opacity=ease(clamp((t-30.8)/.8));
+ const q1=ease(clamp((t-27.7)/.7)),q2=ease(clamp((t-30.9)/.8));$('s2-p1').style.strokeDashoffset=String(380*(1-q1));$('s2-p2').style.strokeDashoffset=String(1050*(1-q2));$('s2-l1').style.opacity=q1;$('s2-l2').style.opacity=q2;
+ show('s2-conc',t,34.2,.7,20);show('s2-note',t,34.4,.6);
+}
+function s3(t){
+ show('s3-t',t,37.7,.7);show('s3-k',t,37.6,.6);show('s3-s',t,37.9,.6);
+ sticker('s3-img',t,37.9,.7);
+ show('s3-en',t,42.2,.8,24);show('s3-cn',t,42.6,.7,18);
+ $('s3-hl2').style.opacity=ease(clamp((t-45.6)/.8));
+ $('s3-stamp').style.opacity=ease(clamp((t-50.9)/.7));
+ $('s3-stamp').style.transform=`rotate(-8deg) scale(${.9+.1*ease(clamp((t-50.9)/.7))})`;
+ wipe('s3-quote',t,45.8,.8);show('s3-note',t,51.2,.6);ruleIn('s3-r',t,42.0,.8);
+}
+function s4(t){
+ show('s4-t',t,54.5,.7);show('s4-k',t,54.4,.6);show('s4-s',t,54.7,.6);
+ sticker('s4-img',t,54.7,-1.0);
+ wipe('s4-q1',t,61.9,.8);wipe('s4-q2',t,66.6,.8);
+ show('s4-neq',t,57.9,.6);show('s4-nl',t,58.2,.6);
+ const mp=t<61.4?ease(clamp((t-57.9)/.6)):0;$('s4-mid').style.opacity=mp;
+ $('s4-hl2').style.opacity=ease(clamp((t-58.0)/.8));
+}
+function s5(t){
+ show('s5-t',t,69.8,.7);show('s5-k',t,69.7,.6);show('s5-s',t,70.0,.6);
+ const mp=ease(clamp((t-69.9)/.6));$('s5-mount').style.opacity=mp;$('s5-mount').style.transform=`rotate(-3.4deg) translateY(${(1-mp)*12}px)`;sticker('s5-smf',t,70.0,-2.6);sticker('s5-h',t,73.3,.8);
+ const tp=ease(clamp((t-76.6)/.8));['s5-rail','s5-d1','s5-d2','s5-d3','s5-t1','s5-t2','s5-t3'].forEach(id=>$(id).style.opacity=tp);
+ show('s5-n1',t,76.6,.6);show('s5-l1',t,76.7,.5);
+ show('s5-n2',t,77.6,.6);show('s5-l2',t,77.7,.5);
+ show('s5-n3',t,79.0,.6);show('s5-l3',t,79.1,.5);
+ show('s5-n4',t,80.9,.7);show('s5-l4',t,81.0,.5);
+ $('s5-stamp').style.opacity=ease(clamp((t-82.8)/.7));
+ $('s5-stamp').style.transform=`rotate(-7deg) scale(${.9+.1*ease(clamp((t-82.8)/.7))})`;
+ show('s5-cot',t,86.6,.7);show('s5-cotl',t,86.8,.6);
+}
+function s6(t){
+ show('s6-t',t,90.6,.7);show('s6-k',t,90.5,.6);show('s6-s',t,90.9,.6);
+ show('s6-table',t,91.0,.8);show('s6-cap',t,93.8,.6);
+ show('s6-i1',t,94.0,.6);show('s6-i2',t,95.2,.6);show('s6-i3',t,96.4,.6);
+ show('s6-big',t,98.7,.8,24);show('s6-big2',t,98.8,.8,24);$('s6-m').style.opacity=ease(clamp((t-98.8)/.8));
+ ['s6-n1','s6-n2','s6-n3'].forEach(id=>$(id).style.opacity=ease(clamp((t-99.2)/.6)));['s6-l1','s6-l2','s6-l3'].forEach(id=>$(id).style.opacity=ease(clamp((t-99.2)/.6)));
+ show('s6-c1',t,99.4,.7);show('s6-c2',t,99.7,.7);show('s6-c3',t,100.0,.7);
+ const on=Math.min(2,Math.floor((t-102.6)/1.3));
+ [1,2,3].forEach((n,k)=>{const el=$('s6-c'+n);if(!el)return;const active=t>=102.6&&k===on;el.style.background=active?'rgba(255,255,255,.98)':'rgba(255,255,255,.6)';el.style.boxShadow=active?'0 24px 50px rgba(255,90,54,.22)':'none';const nn=$('s6-n'+n);if(nn)nn.style.color=active?'var(--orange)':'var(--muted)';});
+}
+function chapter(t){return t<17.3?1:t<37.5?2:t<90.4?3:4}
+function camSpeed(t){const a=cam(t-.05),b=cam(t+.05);const dx=(b.x-a.x)*a.z,dy=(b.y-a.y)*a.z,dz=600*Math.log(b.z/a.z);return Math.hypot(dx,dy,dz)/.1}
+function render(t){
+ t=clamp(t,0,DUR);
+ const c=cam(t);
+ const sp=camSpeed(t);world.style.filter=sp>300?`blur(${Math.min(.7,sp/1800)}px)`:'none';
+ world.style.transform=`translate(${960-(c.x||1200)*c.z}px, ${540-c.y*c.z}px) scale(${c.z})`;
+ s0(t);s1(t);s2(t);s3(t);s4(t);s5(t);s6(t);
+ let i=0;while(i<CUES.length-1&&t>=CUES[i+1].start)i++;
+ $('sub').textContent=CUES[i].text;
+ $('sub').style.opacity=clamp((t-CUES[i].start)/.22);
+ $('ch').textContent=`0${chapter(t)} / 04`;
+ $('bar').style.width=`${(t/DUR)*100}%`;
+ $('clock').textContent=`${fmt(t)} / ${fmt(DUR)}`;
+}
+
+const fmt=t=>{t=Math.max(0,t);const m=Math.floor(t/60),x=t-m*60;return `${String(m).padStart(2,'0')}:${x.toFixed(1).padStart(4,'0')}`};
+let current=0,origin=performance.now(),playing=true,audioDriven=false;
+const voice=$('voice');
+function clock(){return audioDriven&&!voice.paused?voice.currentTime:current+(playing?(performance.now()-origin)/1000:0)}
+function setTime(t){current=clamp(t,0,DUR);origin=performance.now();if(audioDriven)voice.currentTime=current;render(current)}
+function tick(){const t=clamp(clock(),0,DUR);if(t>=DUR){current=DUR;playing=false;$('play').textContent='播放';}render(t);requestAnimationFrame(tick)}
+$('play').onclick=()=>{if(playing){current=clamp(clock(),0,DUR);playing=false;voice.pause();$('play').textContent='播放';}else{origin=performance.now();playing=true;if(audioDriven){voice.currentTime=current;voice.play().catch(()=>{});}$('play').textContent='暂停';}};
+$('replay').onclick=()=>{playing=false;voice.pause();audioDriven=false;setTime(0);playing=true;$('play').textContent='暂停';};
+$('sound').onclick=async()=>{current=clamp(clock(),0,DUR);voice.currentTime=current;try{await voice.play();audioDriven=true;playing=true;$('sound').textContent='旁白已开启';$('play').textContent='暂停';}catch(e){$('sound').textContent='点击开启旁白'}};
+$('seek').oninput=e=>{playing=false;voice.pause();audioDriven=false;$('play').textContent='播放';setTime(+e.target.value)};
+window.seek=t=>{playing=false;voice.pause();audioDriven=false;setTime(t)};
+function fit(){const s=Math.min(innerWidth/1920,(innerHeight-50)/1080);stage.style.transform=`translate(${(innerWidth-1920*s)/2}px, ${(innerHeight-50-1080*s)/2}px) scale(${s})`}
+addEventListener('resize',fit);fit();
+const q=new URLSearchParams(location.search);if(q.has('t')){setTime(+q.get('t'));playing=false;$('play').textContent='播放';}else{render(0);voice.play().then(()=>{audioDriven=true;$('sound').textContent='旁白已开启'}).catch(()=>{});}
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

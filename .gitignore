@@ -1,0 +1,23 @@
+# Python 虚拟环境 / 缓存
+.venv/
+.venv-*/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# 系统与编辑器
+.DS_Store
+._*
+.vscode/
+.idea/
+
+# 依赖与构建产物
+node_modules/
+.cache/
+dist/
+build/
+
+# 渲染临时输出
+*.tmp
+*.log

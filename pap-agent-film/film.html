@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 替你办事，权限由谁决定？ · Poppy</title>
+<style>
+@font-face{font-family:'Alibaba PuHuiTi';src:url('assets/fonts/AlibabaPuHuiTi-3-115-Black.woff2') format('woff2');font-weight:1000;font-display:block}
+@font-face{font-family:'Alibaba PuHuiTi';src:url('assets/fonts/AlibabaPuHuiTi-3-105-Heavy.woff2') format('woff2');font-weight:900;font-display:block}
+@font-face{font-family:'Alibaba PuHuiTi';src:url('assets/fonts/AlibabaPuHuiTi-3-85-Bold.woff2') format('woff2');font-weight:700;font-display:block}
+@font-face{font-family:'Alibaba PuHuiTi';src:url('assets/fonts/AlibabaPuHuiTi-3-65-Medium.woff2') format('woff2');font-weight:500;font-display:block}
+@font-face{font-family:'Alibaba PuHuiTi';src:url('assets/fonts/AlibabaPuHuiTi-3-55-Regular.woff2') format('woff2');font-weight:400;font-display:block}
+@font-face{font-family:'Inter';src:url('assets/fonts/Inter-VF.ttf') format('truetype');font-weight:100 900;font-display:block}
+@font-face{font-family:'JetBrains Mono';src:url('assets/fonts/JetBrainsMono-VF.ttf') format('truetype');font-weight:100 800;font-display:block}
+@font-face{font-family:'Chakra Petch';src:url('assets/fonts/ChakraPetch-SemiBold.ttf') format('truetype');font-weight:600;font-display:block}
+@font-face{font-family:'Cormorant Garamond';src:url('assets/fonts/CormorantGaramond-VF.ttf') format('truetype');font-weight:300 700;font-display:block}
+@font-face{font-family:'Noto Serif SC';src:url('assets/fonts/NotoSerifSC-VF.ttf') format('truetype');font-weight:200 900;font-display:block}
+
+  :root{--paper:#E9EEF2;--ink:#25313D;--muted:#7C8B99;--orange:#FF5A36;--green:#2F7D5A;--red:#D6452F;--tape:#F2C14E;--white:#F7F9FB;--display:'Inter',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0E141A;color:var(--ink);font-family:'Alibaba PuHuiTi',sans-serif;overflow:hidden}
+  #wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+  #stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;background:var(--paper);box-shadow:0 30px 90px #000a}
+  #world{position:absolute;left:0;top:0;width:2400px;height:7200px;transform-origin:0 0;
+    background-color:var(--paper);
+    background-image:radial-gradient(circle,#C5CFD8 2.2px,transparent 2.9px),radial-gradient(120% 90% at 30% 30%,#F4F6F8 0%,#E9EEF2 55%,#DDE4EA 100%);
+    background-size:48px 48px,100% 100%;background-position:0 0}
+  section{position:absolute;left:40px;width:2360px;height:1000px}
+  .zh{font-family:'Alibaba PuHuiTi',sans-serif}
+  .num{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+  .serif{font-family:'Cormorant Garamond','Noto Serif SC',"STSong",serif}
+  .kicker{display:none!important;position:absolute;left:180px;top:46px;align-items:center;gap:14px;font:600 18px/1 'JetBrains Mono',monospace;letter-spacing:.12em;color:var(--muted)}
+  .kicker i{display:block;width:12px;height:12px;background:var(--orange)}
+  .label{position:absolute;font:500 15px/1.4 'JetBrains Mono',monospace;letter-spacing:.08em;color:var(--muted)}
+  .rule{position:absolute;height:2px;background:var(--ink);transform-origin:0 50%}
+  .rule.o{background:var(--orange)}
+  .sticker{position:absolute;background:#fff;padding:13px;border-radius:9px;box-shadow:0 28px 60px rgba(22,34,46,.22);transform-origin:50% 50%}
+  .sticker img{display:block;width:100%;border-radius:2px}
+  .cap{position:absolute;left:2px;top:-26px;font:500 13px/1 'JetBrains Mono',monospace;color:var(--muted);white-space:nowrap}
+  .hl{--p:1;position:absolute;border:0!important;background:url('assets/paint-stroke.png') center/100% 100% no-repeat!important;pointer-events:none;mix-blend-mode:multiply;transform:rotate(-.45deg);filter:saturate(1.05);clip-path:inset(0 calc((1 - var(--p)) * 100%) 0 0);-webkit-mask-image:linear-gradient(90deg,#000 0%,#000 calc(var(--p) * 100% - 6%),transparent calc(var(--p) * 100%));mask-image:linear-gradient(90deg,#000 0%,#000 calc(var(--p) * 100% - 6%),transparent calc(var(--p) * 100%));-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;will-change:clip-path}
+  .tape{position:absolute;width:82px;height:24px;background:url('assets/textures/washi.png') center/cover;opacity:.9;transform:rotate(-6deg);box-shadow:0 3px 8px rgba(22,34,46,.12);mix-blend-mode:multiply}
+  .stamp{position:absolute;border:6px solid var(--red);color:var(--red);padding:12px 22px;font:800 30px/1 'Alibaba PuHuiTi',sans-serif;letter-spacing:.08em;background:rgba(233,238,242,.75);transform-origin:50% 50%}
+  .card{position:absolute;background:rgba(255,255,255,.55);border-radius:6px}
+  .num-big{font-family:var(--display);font-weight:700;letter-spacing:-.04em;line-height:.9}
+  .sub{position:absolute;left:50%;bottom:52px;transform:translateX(-50%);font:500 30px/1.4 'Alibaba PuHuiTi',sans-serif;color:var(--ink);white-space:nowrap;background:rgba(233,238,242,.92);padding:8px 18px;border-radius:4px;box-shadow:0 8px 24px rgba(22,34,46,.10)}
+  .sub b{color:var(--orange);font-weight:700}
+  #vig{position:absolute;inset:0;pointer-events:none;z-index:1;background:radial-gradient(ellipse at 42% 38%,rgba(255,255,255,0) 55%,rgba(33,45,55,.10) 100%)}
+  #papertex{position:absolute;inset:0;pointer-events:none;opacity:.14;mix-blend-mode:multiply;z-index:1;background:url('assets/textures/paper.jpg') center/cover}
+  #grain{position:absolute;inset:0;pointer-events:none;opacity:.12;mix-blend-mode:overlay;z-index:1;background:url('assets/textures/grain.png') center/512px repeat}
+  #ink{position:absolute;inset:0;pointer-events:none;opacity:.12;mix-blend-mode:multiply;z-index:1;background:url('assets/ink.png') center/cover}
+  #dust{position:absolute;inset:0;pointer-events:none;opacity:.07;mix-blend-mode:screen;z-index:1;background:url('assets/textures/dust.png') center/cover}
+  .macro{position:relative;overflow:hidden;background:#0D1412;border:1px solid #33443B}
+  .macro img{position:absolute;image-rendering:pixelated;filter:contrast(1.12) saturate(1.06)}
+  .macro:after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.055) 0 1px,transparent 1px 3px)}
+  .idepanel{position:absolute;background:#101916;border:1px solid #33443B;border-radius:8px;box-shadow:0 28px 60px rgba(10,16,14,.26);overflow:hidden}
+  .allow{position:absolute;right:20px;bottom:18px;background:var(--green);color:#fff;font:700 15px/1 'JetBrains Mono';padding:8px 16px;border-radius:999px;letter-spacing:.08em}
+  .evcard{position:absolute;background:rgba(255,255,255,.66);border-radius:6px;box-shadow:0 18px 42px rgba(22,34,46,.18);overflow:hidden}
+  .evcard.g{border-top:3px solid var(--green)}
+  .evcard.r{border-top:3px solid var(--red)}
+  .papercard{position:absolute;background:#fff;border-radius:5px;box-shadow:0 24px 55px rgba(22,34,46,.16);overflow:hidden}
+  .codecard{position:absolute;background:#18231F;border:1px solid #33443B;border-radius:8px;box-shadow:0 28px 60px rgba(10,16,14,.26);overflow:hidden}
+  .termcard{position:absolute;background:#121C18;border:1px solid #2F6B4B;border-radius:8px;box-shadow:0 28px 60px rgba(10,16,14,.26);overflow:hidden}
+  .codehead{position:absolute;left:0;right:0;top:0;height:34px;background:#0E1613;display:flex;align-items:center;padding:0 13px;gap:5px;color:#8FA39A;font:500 11px/1 'JetBrains Mono'}
+  .codehead i{display:block;width:7px;height:7px;border-radius:50%;background:#3C4B44}
+  .codehead span{margin-left:8px}
+  #s0-grid i{aspect-ratio:1;background:rgba(37,49,61,.10);border-radius:2px}
+  #s0-grid i.on{background:var(--orange)}
+  .rail{position:absolute;height:0;transform-origin:0 50%;pointer-events:none}
+  .marker{position:absolute;background:linear-gradient(90deg,rgba(255,90,54,.03),rgba(255,90,54,.18) 14%,rgba(255,90,54,.18) 86%,rgba(255,90,54,.03));border-radius:3px;transform:rotate(-1.4deg) skewX(-4deg);z-index:0;pointer-events:none}
+  .torn{clip-path:polygon(0 3%,2% 0,98% 1%,100% 4%,99% 96%,97% 100%,2% 99%,0 95%)}
+  #topbar{position:absolute;left:0;top:0;right:0;height:86px;background:linear-gradient(#E9EEF2 0%,#E9EEF2 58%,rgba(233,238,242,0) 100%);z-index:2;pointer-events:none}
+  #hud{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none;z-index:3}
+  #sub{z-index:3}
+  #hud .brand{position:absolute;left:54px;top:30px;font:700 22px/1 'Alibaba PuHuiTi',sans-serif;color:var(--ink)}
+  #hud .brand i{display:inline-block;width:13px;height:13px;background:var(--orange);margin-right:10px;vertical-align:-1px}
+  #hud .brand small{font:600 14px/1 'Chakra Petch',sans-serif;letter-spacing:.14em;color:var(--muted);margin-left:14px}
+  #hud .ch{position:absolute;right:54px;top:32px;font:600 14px/1 'Chakra Petch',sans-serif;letter-spacing:.1em;color:var(--muted)}
+  #hud .bar{position:absolute;left:54px;right:54px;bottom:22px;height:3px;background:#C5CFD8}
+  #hud .bar i{display:block;height:3px;background:var(--orange);width:0}
+  #ctl{position:fixed;left:0;right:0;bottom:0;height:50px;display:flex;align-items:center;gap:12px;padding:0 16px;background:#0B1014;color:#DDE3E7;font:12px/1 'Alibaba PuHuiTi',sans-serif;z-index:20}
+  #ctl button{background:#172127;color:#E7ECEF;border:1px solid #2C3B44;border-radius:999px;padding:6px 12px;font:12px 'Alibaba PuHuiTi',sans-serif;cursor:pointer}
+  #ctl button:hover{border-color:#5A7280}
+  #ctl input{flex:1;accent-color:var(--orange)}
+  #ctl .t{font:500 12px/1 'JetBrains Mono',monospace;color:#9FB0BB;min-width:128px;text-align:right}
+</style>
+</head>
+<body>
+<div id="wrap"><div id="stage"><div id="world">
+
+  <section id="s0" style="top:0;left:40px">
+    <div class="zh" id="p0-t" style="position:absolute;left:180px;top:82px;font:900 50px/1.1 'Alibaba PuHuiTi';color:var(--ink)">AI 替你办事，<br><span style="color:var(--orange)">权限由谁决定？</span></div>
+
+    <div class="sticker" id="p0-photo" style="left:180px;top:240px;width:1050px" data-rot="-1">
+      <img src="assets/summit-link.jpg" alt="">
+      <div class="hl" data-ps="1.2" style="left:52%;top:57%;width:25%;height:4%"></div>
+      <div class="hl" data-ps="1.5" style="left:56%;top:64.5%;width:9%;height:4.5%"></div>
+      <div class="cap">SIERRA SUMMIT / 演示原片</div>
+    </div>
+
+    <div class="evcard g" id="p0-c1" style="left:1300px;top:240px;width:620px;height:215px">
+      <div class="label" style="left:22px;top:18px;color:var(--green)">01 / 连接</div>
+      <div class="zh" style="position:absolute;left:22px;top:58px;font:800 29px/1.35 'Alibaba PuHuiTi';color:var(--ink)">Allow Muse to contact<br>a Rocket agent?</div>
+      <div class="allow">ALLOW</div>
+    </div>
+
+    <div class="evcard r" id="p0-c2" style="left:1300px;top:490px;width:620px;height:215px">
+      <div class="label" style="left:22px;top:18px;color:var(--red)">02 / 登录</div>
+      <div class="zh" style="position:absolute;left:22px;top:58px;font:800 29px/1.35 'Alibaba PuHuiTi';color:var(--ink)">Allow Muse to sign in<br>to Rocket Mortgage?</div>
+      <div class="allow">ALLOW</div>
+    </div>
+
+    <div class="sticker" id="p0-x" style="left:1300px;top:745px;width:250px">
+      <img src="assets/x-demo.png" alt="">
+      <div class="cap">X / @SIERRA · 10.07</div>
+    </div>
+
+    <div class="zh" id="p0-b" style="position:absolute;left:180px;top:860px;font:700 36px/1.35 'Alibaba PuHuiTi';color:var(--muted);opacity:0">一次演示，两层允许。</div>
+  </section>
+
+  <section id="s1" style="top:0;left:2440px">
+    <div class="zh" id="p1-t" style="position:absolute;left:180px;top:82px;font:900 48px/1.1 'Alibaba PuHuiTi';color:var(--ink)">Poppy：给代理写规则</div>
+
+    <div class="num" id="p1-35" style="position:absolute;left:170px;top:176px;font:900 176px/1 var(--display);color:var(--orange)">35</div>
+    <div class="zh" style="position:absolute;left:440px;top:278px;font:700 26px/1.3 'Alibaba PuHuiTi';color:var(--ink)">家设计伙伴<br><span style="color:var(--muted)">design partners</span></div>
+
+    <div class="stamp" id="p1-draft" style="left:170px;top:390px;font-size:22px;border-width:5px;opacity:0">DRAFT 0.1<br><span style="font-size:15px">2026.10.09</span></div>
+    <div class="zh" id="p1-cav" style="position:absolute;left:170px;top:518px;font:800 30px/1.4 'Alibaba PuHuiTi';color:var(--red);opacity:0">设计伙伴 ≠ 已部署</div>
+
+    <div class="sticker" id="p1-diagram" style="left:760px;top:180px;width:860px" data-rot="0.8">
+      <img src="assets/partner-diagram.jpg" alt="">
+      <div class="hl" data-ps="18.2" style="left:30%;top:47.5%;width:42%;height:8%"></div>
+      <div class="cap">EUROPA PRESS / POPPY PARTNERS</div>
+    </div>
+
+    <div class="sticker" id="p1-spk" style="left:1690px;top:180px;width:220px" data-rot="-2">
+      <img src="assets/speaker.png" alt="">
+      <div class="cap">ALEX MCGILLIS / ROCKET</div>
+    </div>
+
+    <div class="rail" id="p1-tl" style="left:180px;top:722px;width:1520px;border-top:2px solid #CBD5DE;opacity:0"></div>
+    <div id="p1-d1" style="position:absolute;left:294px;top:716px;width:14px;height:14px;border-radius:50%;background:var(--orange);opacity:0"></div>
+    <div id="p1-d2" style="position:absolute;left:894px;top:716px;width:14px;height:14px;border-radius:50%;background:var(--red);opacity:0"></div>
+    <div id="p1-d3" style="position:absolute;left:1494px;top:716px;width:14px;height:14px;border-radius:50%;background:var(--green);opacity:0"></div>
+    <div class="label" id="p1-tl1" style="left:250px;top:680px;opacity:0">10.06 公布</div>
+    <div class="label" id="p1-tl2" style="left:850px;top:680px;opacity:0">10.09 草案</div>
+    <div class="label" id="p1-tl3" style="left:1450px;top:680px;opacity:0">35 家设计伙伴</div>
+
+    <div class="label" id="p1-sess" style="left:180px;top:812px;opacity:0">同一次会话</div>
+    <div class="rail" id="p1-rail" style="left:180px;top:902px;width:1680px;border-top:2px solid #CBD5DE;opacity:0"></div>
+    <div class="evcard" id="p1-ch1" style="left:540px;top:830px;width:320px;height:130px;opacity:0"><div class="label" style="left:20px;top:16px;color:var(--orange)">01 / 网页</div><div class="zh" style="position:absolute;left:20px;top:52px;font:700 21px/1.4 'Alibaba PuHuiTi'">商家网站</div></div>
+    <div class="evcard" id="p1-ch2" style="left:900px;top:830px;width:320px;height:130px;opacity:0"><div class="label" style="left:20px;top:16px;color:var(--orange)">02 / API</div><div class="zh" style="position:absolute;left:20px;top:52px;font:700 21px/1.4 'Alibaba PuHuiTi'">接口调用</div></div>
+    <div class="evcard" id="p1-ch3" style="left:1260px;top:830px;width:320px;height:130px;opacity:0"><div class="label" style="left:20px;top:16px;color:var(--orange)">03 / 企业代理</div><div class="zh" style="position:absolute;left:20px;top:52px;font:700 21px/1.4 'Alibaba PuHuiTi'">企业侧代理</div></div>
+    <div class="zh" id="p1-note" style="position:absolute;left:1620px;top:850px;font:700 22px/1.4 'Alibaba PuHuiTi';color:var(--muted);opacity:0">授权随任务<br>延续</div>
+  </section>
+
+  <section id="s2" style="top:1120px;left:2440px">
+    <div class="zh" id="p2-t" style="position:absolute;left:180px;top:82px;font:900 48px/1.1 'Alibaba PuHuiTi';color:var(--ink)">允许读取，不等于允许修改</div>
+    <div class="sticker" id="p2-spec" style="left:180px;top:200px;width:1000px" data-rot="0.6">
+      <img src="assets/spec-scopes.png" alt="">
+      <div class="hl" data-ps="41.8" style="left:2%;top:40.9%;width:96%;height:11.6%"></div>
+      <div class="hl" data-ps="45.6" style="left:2%;top:52.7%;width:96%;height:11.6%"></div>
+      <div class="cap">PERSONAL AGENT PROTOCOL / SCOPES</div>
+    </div>
+    <div class="evcard g" id="p2-read" style="left:1250px;top:220px;width:620px;height:200px;opacity:0"><div class="label" style="left:22px;top:16px;color:var(--green)">READ</div><div class="zh" style="position:absolute;left:22px;top:56px;font:900 36px/1 'Alibaba PuHuiTi'">查看订单</div><div class="zh" style="position:absolute;left:22px;bottom:18px;font:500 18px/1.3 'Alibaba PuHuiTi';color:var(--muted)">读权限不自动带来写权限</div></div>
+    <div class="evcard r" id="p2-write" style="left:1250px;top:470px;width:620px;height:200px;opacity:0"><div class="label" style="left:22px;top:16px;color:var(--red)">WRITE</div><div class="zh" style="position:absolute;left:22px;top:56px;font:900 36px/1 'Alibaba PuHuiTi'">修改订单</div><div class="zh" style="position:absolute;left:22px;bottom:18px;font:500 18px/1.3 'Alibaba PuHuiTi';color:var(--muted)">每一步都由企业检查</div></div>
+    <div class="num" id="p2-neq" style="position:absolute;left:1000px;top:650px;font:700 84px/1 'JetBrains Mono';color:var(--orange);opacity:0">≠</div>
+    <div class="zh" id="p2-b" style="position:absolute;left:180px;top:790px;font:700 34px/1.35 'Alibaba PuHuiTi';color:var(--ink);opacity:0">企业按每种操作检查权限。</div>
+  </section>
+
+  <section id="s3" style="top:1120px;left:40px">
+    <div class="zh" id="p3-t" style="position:absolute;left:180px;top:82px;font:900 48px/1.1 'Alibaba PuHuiTi';color:var(--ink)">一次确认，绑定一个版本</div>
+    <div class="sticker" id="p3-ops" style="left:180px;top:200px;width:1000px" data-rot="-0.8">
+      <img src="assets/ops-intro.png" alt="">
+      <div class="hl" data-ps="55.3" style="left:2%;top:39.8%;width:96%;height:10.8%"></div>
+      <div class="hl" data-ps="62.6" style="left:2%;top:65%;width:96%;height:6.5%"></div>
+      <div class="cap">PERSONAL AGENT PROTOCOL / OPERATIONS</div>
+    </div>
+    <div class="evcard" id="p3-v1" style="left:1250px;top:220px;width:620px;height:190px;opacity:0"><div class="label" style="left:22px;top:16px;color:var(--green)">批准 v1</div><div class="zh" style="position:absolute;left:22px;top:56px;font:900 34px/1 'Alibaba PuHuiTi'">只能执行 v1 描述的动作</div></div>
+    <div class="evcard" id="p3-v2" style="left:1250px;top:450px;width:620px;height:190px;opacity:0"><div class="label" style="left:22px;top:16px;color:var(--red)">条款变更 → v2</div><div class="zh" style="position:absolute;left:22px;top:56px;font:900 30px/1.2 'Alibaba PuHuiTi'">需要覆盖新版本的批准</div></div>
+    <div class="evcard" id="p3-retry" style="left:1250px;top:680px;width:620px;height:170px;opacity:0"><div class="label" style="left:22px;top:16px;color:var(--orange)">重试</div><div class="zh" style="position:absolute;left:22px;top:54px;font:900 34px/1 'Alibaba PuHuiTi'">至多执行一次</div></div>
+    <div class="zh" id="p3-b" style="position:absolute;left:180px;top:870px;font:700 32px/1.35 'Alibaba PuHuiTi';color:var(--muted);opacity:0">同一动作即使超时重试，也不重复执行。</div>
+  </section>
+
+  <section id="s4" style="top:2240px;left:40px">
+    <div class="zh" id="p4-t" style="position:absolute;left:180px;top:82px;font:900 46px/1.15 'Alibaba PuHuiTi';color:var(--ink)">但谁能证明，用户真的同意？</div>
+    <div class="sticker" id="p4-dino" style="left:180px;top:200px;width:560px" data-rot="-1.2">
+      <img src="assets/x-dino.png" alt="">
+      <div class="hl" data-ps="71.8" style="left:6%;top:27%;width:88%;height:12%"></div>
+      <div class="cap">X / DINO A. DAI ZOVI · 10.11</div>
+    </div>
+    <div class="sticker" id="p4-trust" style="left:780px;top:200px;width:1000px" data-rot="0.5">
+      <img src="assets/ops-trust.png" alt="">
+      <div class="hl" data-ps="76.3" style="left:2%;top:55.2%;width:96%;height:7.5%"></div>
+      <div class="cap">OPERATIONS / §8 原文</div>
+    </div>
+    <div class="zh" id="p4-b" style="position:absolute;left:180px;top:640px;font:900 38px/1.35 'Alibaba PuHuiTi';color:var(--ink);opacity:0">代理声称获准<br><span style="color:var(--red)">≠ 用户真的看过</span></div>
+    <div class="evcard" id="p4-site" style="left:780px;top:760px;width:1000px;height:170px;opacity:0">
+      <div class="label" style="left:22px;top:16px;color:var(--green)">需要更强证明时</div>
+      <div class="zh" style="position:absolute;left:22px;top:50px;font:800 30px/1.2 'Alibaba PuHuiTi'">企业可以让用户回到自己的网站批准</div>
+      <div class="label" style="left:22px;bottom:16px;font-size:11px">该步骤不由此扩展定义</div>
+    </div>
+  </section>
+
+  <section id="s5" style="top:2240px;left:2440px">
+    <div class="zh" id="p5-t" style="position:absolute;left:180px;top:70px;font:900 44px/1.1 'Alibaba PuHuiTi';color:var(--ink)">屏幕上出现了预批信</div>
+    <div class="sticker" id="p5-result" style="left:180px;top:150px;width:900px" data-rot="-0.7">
+      <img src="assets/summit-result.jpg" alt="">
+      <div class="hl" data-ps="94.0" style="left:49%;top:54%;width:14%;height:19%"></div>
+      <div class="cap">SIERRA SUMMIT / 演示结果</div>
+    </div>
+    <div class="label" style="left:1150px;top:240px;color:var(--orange)">演示结果</div>
+    <div class="zh" id="p5-neq" style="position:absolute;left:1150px;top:280px;font:900 52px/1.25 'Alibaba PuHuiTi';color:var(--red);opacity:0">≠<br>贷款已发放</div>
+    <div class="zh" id="p5-note" style="position:absolute;left:1150px;top:470px;font:500 20px/1.5 'Alibaba PuHuiTi';color:var(--muted);opacity:0">公开演示展示的结果，<br>不代表真实放贷或已上线。</div>
+
+    <div class="zh" id="p5-check" style="position:absolute;left:180px;top:682px;font:900 38px/1.1 'Alibaba PuHuiTi';color:var(--ink);opacity:0">下次留意三处</div>
+    <div class="evcard" id="p5-c1" style="left:180px;top:746px;width:480px;height:220px;opacity:0"><div class="label" style="left:16px;top:12px;color:var(--orange)">01</div><div style="position:absolute;left:16px;top:42px;width:172px;height:104px;overflow:hidden"><img src="assets/summit-login.jpg" style="width:100%;height:100%;object-fit:cover"></div><div class="zh" style="position:absolute;left:204px;top:52px;font:800 25px/1.2 'Alibaba PuHuiTi'">访问范围</div><div class="label" style="left:204px;top:90px;font-size:11px">账户登录画面</div></div>
+    <div class="evcard" id="p5-c2" style="left:720px;top:746px;width:480px;height:220px;opacity:0"><div class="label" style="left:16px;top:12px;color:var(--orange)">02</div><div style="position:absolute;left:16px;top:42px;width:172px;height:104px;overflow:hidden"><img src="assets/ops-intro.png" style="width:100%;height:100%;object-fit:cover"></div><div class="zh" style="position:absolute;left:204px;top:52px;font:800 25px/1.2 'Alibaba PuHuiTi'">批准的动作</div><div class="label" style="left:204px;top:90px;font-size:11px">条款版本</div></div>
+    <div class="evcard" id="p5-c3" style="left:1260px;top:746px;width:480px;height:220px;opacity:0"><div class="label" style="left:16px;top:12px;color:var(--orange)">03</div><div style="position:absolute;left:16px;top:42px;width:172px;height:104px;overflow:hidden"><img src="assets/summit-result.jpg" style="width:100%;height:100%;object-fit:cover"></div><div class="zh" style="position:absolute;left:204px;top:52px;font:800 25px/1.2 'Alibaba PuHuiTi'">实际结果</div><div class="label" style="left:204px;top:90px;font-size:11px">演示结果</div></div>
+  </section>
+
+</div>
+  <div id="vig"></div>
+  <div id="papertex"></div>
+  <div id="grain"></div>
+  <div id="ink"></div>
+  <div id="dust"></div>
+  <div id="topbar"></div>
+  <div id="sub" class="sub"></div>
+  <div id="hud">
+    <div class="brand"><i></i>科技观察<small>POPPY / 代理的权限</small></div>
+    <div class="ch" id="ch">01 / 04</div>
+    <div class="bar"><i id="bar"></i></div>
+  </div>
+</div></div>
+<div id="ctl">
+  <button id="play">暂停</button>
+  <button id="replay">重播</button>
+  <input id="seek" type="range" min="0" max="107.4" step="0.01" value="0">
+  <span class="t" id="clock">00:00.0 / 01:47.4</span>
+  <button id="sound">开启旁白</button>
+</div>
+<audio id="voice" src="narration.wav" preload="auto"></audio>
+<script src="timeline.js"></script>
+<script>
+const CUES=window.CUES, DUR=window.__DUR||119.4;
+const world=document.getElementById('world'),stage=document.getElementById('stage');
+const $=id=>document.getElementById(id);
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const ease=x=>{x=clamp(x);return x*x*(3-2*x)};
+const lerp=(a,b,p)=>a+(b-a)*p;
+const CAM=[
+ {t:0,x:1240,y:500,z:.92},{t:16.1,x:1240,y:500,z:.92},{t:17.3,x:3640,y:500,z:.92},
+ {t:39.8,x:3640,y:500,z:.92},{t:41,x:3640,y:1620,z:.92},{t:53.3,x:3640,y:1620,z:.92},
+ {t:54.5,x:1240,y:1620,z:.92},{t:70,x:1240,y:1620,z:.92},{t:71.2,x:1240,y:2740,z:.92},
+ {t:92,x:1240,y:2740,z:.92},{t:93.2,x:3640,y:2740,z:.92},{t:119.4,x:3640,y:2740,z:.92}
+];
+function cam(t){
+ if(t<=CAM[0].t)return {x:CAM[0].x||1200,y:CAM[0].y,z:CAM[0].z};
+ for(let i=1;i<CAM.length;i++){
+  const a=CAM[i-1],b=CAM[i];
+  if(t<=b.t){const p=ease((t-a.t)/(b.t-a.t));return {x:lerp(a.x||1200,b.x||1200,p),y:lerp(a.y,b.y,p),z:lerp(a.z,b.z,p)}}
+ }
+ return {x:CAM[CAM.length-1].x||1200,y:CAM[CAM.length-1].y,z:CAM[CAM.length-1].z};
+}
+function show(id,t,start,dur=.6,dy=18){
+ const el=$(id);if(!el)return;const p=ease(clamp((t-start)/dur));
+ el.style.opacity=p;el.style.transform=`translateY(${(1-p)*dy}px)`;
+}
+function sticker(id,t,land,rot=0,amp=.16){
+ const el=$(id);if(!el)return;const q=(t-(land-.24))/.24;
+ if(q<0){el.style.opacity=0;el.style.transform=`rotate(${rot}deg) scale(${1+amp})`;return}
+ if(q<1){const L=1-q*q;el.style.opacity=Math.min(1,q*4);el.style.transform=`rotate(${rot+4*L}deg) scale(${1+amp*L})`;return}
+ const dt=t-land,w=Math.exp(-9*dt)*Math.cos(2*Math.PI*4.2*dt);
+ el.style.opacity=1;el.style.transform=`rotate(${rot-.7*w}deg) scale(${1-.025*w})`;
+}
+function ruleIn(id,t,start,dur=.7){const el=$(id);if(!el)return;const p=ease(clamp((t-start)/dur));el.style.transform=`scaleX(${p})`}
+function wipe(id,t,start,dur=.7){const el=$(id);if(!el)return;const p=ease(clamp((t-start)/dur));el.style.opacity=Math.min(1,p*3);el.style.clipPath=`inset(0 ${100*(1-p)}% 0 0)`}
+function count(id,t,start,dur,to,suffix=''){const el=$(id);if(!el)return;const p=ease(clamp((t-start)/dur));el.textContent=Math.round(to*p)+suffix}
+
+function s0(t){
+ show('p0-t',t,.2,.8);sticker('p0-photo',t,.6,-1);show('p0-c1',t,1.0,.7);show('p0-c2',t,9.2,.7);
+ sticker('p0-x',t,2.0,2);show('p0-b',t,13.9,.7);
+}
+function s1(t){
+ show('p1-t',t,17.5,.7);count('p1-35',t,17.6,1.0,35);
+ sticker('p1-diagram',t,17.8,.8);sticker('p1-spk',t,18.0,-2);
+ $('p1-draft').style.opacity=ease(clamp((t-18.0)/.6));$('p1-cav').style.opacity=ease(clamp((t-18.4)/.6));
+ const tp=ease(clamp((t-18.0)/.7));['p1-tl','p1-d1','p1-d2','p1-d3','p1-tl1','p1-tl2','p1-tl3'].forEach(id=>$(id).style.opacity=tp);
+ show('p1-sess',t,25.9,.6);show('p1-ch1',t,26.0,.6);show('p1-ch2',t,27.1,.6);show('p1-ch3',t,28.2,.6);
+ $('p1-rail').style.opacity=ease(clamp((t-26.2)/.7));$('p1-rail').style.transform=`scaleX(${ease(clamp((t-26.2)/.8))})`;$('p1-rail').style.transformOrigin='0 50%';
+ show('p1-note',t,37.8,.6);
+}
+function s2(t){
+ show('p2-t',t,41.2,.7);sticker('p2-spec',t,41.3,.6);show('p2-read',t,41.6,.6);show('p2-write',t,45.5,.6);
+ show('p2-neq',t,49.5,.6);show('p2-b',t,50.0,.6);
+}
+function s3(t){
+ show('p3-t',t,54.8,.7);sticker('p3-ops',t,54.9,-.8);show('p3-v1',t,55.2,.6);show('p3-v2',t,58.6,.6);
+ show('p3-retry',t,62.4,.6);show('p3-b',t,66.7,.6);
+}
+function s4(t){
+ show('p4-t',t,71.5,.7);sticker('p4-dino',t,71.6,-1.2);sticker('p4-trust',t,76.2,.5);
+ show('p4-b',t,80.6,.7);show('p4-site',t,88.7,.7);
+}
+function s5(t){
+ show('p5-t',t,93.5,.7);sticker('p5-result',t,93.6,-.7);show('p5-neq',t,96.9,.7);show('p5-note',t,97.2,.6);
+ show('p5-check',t,110.2,.7);show('p5-c1',t,110.3,.6);show('p5-c2',t,110.5,.6);show('p5-c3',t,110.7,.6);
+ const on=t>=113.8?Math.min(2,Math.floor((t-113.8)/1.35)):-1;
+ [1,2,3].forEach((n,k)=>{const el=$('p5-c'+n);if(!el)return;const a=on===k;el.style.background=a?'rgba(255,255,255,.98)':'rgba(255,255,255,.66)';el.style.boxShadow=a?'0 18px 40px rgba(255,90,54,.24)':'0 18px 42px rgba(22,34,46,.18)';});
+}
+function chapter(t){return t<17.3?1:t<54.5?2:t<93.2?3:4}
+function camSpeed(t){const a=cam(t-.05),b=cam(t+.05);const dx=(b.x-a.x)*a.z,dy=(b.y-a.y)*a.z,dz=600*Math.log(b.z/a.z);return Math.hypot(dx,dy,dz)/.1}
+function paintAll(t){for(const el of document.querySelectorAll('.hl')){const ps=parseFloat(el.dataset.ps);if(!isFinite(ps)){el.style.setProperty('--p','1');continue}const pd=parseFloat(el.dataset.pd)||.85;el.style.setProperty('--p',String(ease(clamp((t-ps)/pd))));}}
+function render(t){
+ t=clamp(t,0,DUR);
+ const c=cam(t);
+ const sp=camSpeed(t);world.style.filter=sp>300?`blur(${Math.min(.7,sp/1800)}px)`:'none';
+ world.style.transform=`translate(${960-(c.x||1200)*c.z}px, ${540-c.y*c.z}px) scale(${c.z})`;
+ s0(t);s1(t);s2(t);s3(t);s4(t);s5(t);paintAll(t);
+ let i=0;while(i<CUES.length-1&&t>=CUES[i+1].start)i++;
+ $('sub').textContent=CUES[i].text;
+ $('sub').style.opacity=clamp((t-CUES[i].start)/.22);
+ $('ch').textContent=`0${chapter(t)} / 04`;
+ $('bar').style.width=`${(t/DUR)*100}%`;
+ $('clock').textContent=`${fmt(t)} / ${fmt(DUR)}`;
+}
+
+const fmt=t=>{t=Math.max(0,t);const m=Math.floor(t/60),x=t-m*60;return `${String(m).padStart(2,'0')}:${x.toFixed(1).padStart(4,'0')}`};
+let current=0,origin=performance.now(),playing=true,audioDriven=false;
+const voice=$('voice');
+function clock(){return audioDriven&&!voice.paused?voice.currentTime:current+(playing?(performance.now()-origin)/1000:0)}
+function setTime(t){current=clamp(t,0,DUR);origin=performance.now();if(audioDriven)voice.currentTime=current;render(current)}
+function tick(){const t=clamp(clock(),0,DUR);if(t>=DUR){current=DUR;playing=false;$('play').textContent='播放';}render(t);requestAnimationFrame(tick)}
+$('play').onclick=()=>{if(playing){current=clamp(clock(),0,DUR);playing=false;voice.pause();$('play').textContent='播放';}else{origin=performance.now();playing=true;if(audioDriven){voice.currentTime=current;voice.play().catch(()=>{});}$('play').textContent='暂停';}};
+$('replay').onclick=()=>{playing=false;voice.pause();audioDriven=false;setTime(0);playing=true;$('play').textContent='暂停';};
+$('sound').onclick=async()=>{current=clamp(clock(),0,DUR);voice.currentTime=current;try{await voice.play();audioDriven=true;playing=true;$('sound').textContent='旁白已开启';$('play').textContent='暂停';}catch(e){$('sound').textContent='点击开启旁白'}};
+$('seek').oninput=e=>{playing=false;voice.pause();audioDriven=false;$('play').textContent='播放';setTime(+e.target.value)};
+window.seek=t=>{playing=false;voice.pause();audioDriven=false;setTime(t)};
+function fit(){const s=Math.min(innerWidth/1920,(innerHeight-50)/1080);stage.style.transform=`translate(${(innerWidth-1920*s)/2}px, ${(innerHeight-50-1080*s)/2}px) scale(${s})`}
+addEventListener('resize',fit);fit();
+const q=new URLSearchParams(location.search);if(q.has('t')){setTime(+q.get('t'));playing=false;$('play').textContent='播放';}else{render(0);voice.play().then(()=>{audioDriven=true;$('sound').textContent='旁白已开启'}).catch(()=>{});}
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

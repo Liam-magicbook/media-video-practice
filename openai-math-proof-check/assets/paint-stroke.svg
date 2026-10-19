@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 60" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="pigment" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#F8EC9C" stop-opacity=".36"/>
+      <stop offset=".16" stop-color="#F2DF72" stop-opacity=".62"/>
+      <stop offset=".48" stop-color="#EBD452" stop-opacity=".74"/>
+      <stop offset=".76" stop-color="#F5E585" stop-opacity=".60"/>
+      <stop offset="1" stop-color="#F8EC9C" stop-opacity=".34"/>
+    </linearGradient>
+    <mask id="brush">
+      <path d="M4 24 C50 11,120 7,205 13 C295 19,370 7,462 12 C526 15,568 9,597 17 L593 33 C560 47,505 38,442 42 C352 48,268 35,190 41 C120 46,62 51,5 38 Z" fill="#fff"/>
+      <path d="M28 16 C120 12,210 11,318 15 C430 19,505 10,574 16 L572 23 C505 18,430 24,318 21 C210 18,122 20,30 23 Z" fill="#fff" opacity=".5"/>
+      <g fill="#000">
+        <ellipse cx="74" cy="22" rx="13" ry="3.4"/>
+        <ellipse cx="188" cy="45" rx="11" ry="2.8"/>
+        <ellipse cx="300" cy="18" rx="9" ry="2.6"/>
+        <ellipse cx="406" cy="44" rx="15" ry="3.2"/>
+        <ellipse cx="512" cy="20" rx="10" ry="2.8"/>
+        <ellipse cx="250" cy="34" rx="7" ry="2"/>
+        <ellipse cx="555" cy="42" rx="6" ry="2"/>
+        <rect x="130" y="8" width="5" height="46"/>
+        <rect x="348" y="8" width="3" height="46"/>
+        <rect x="470" y="8" width="6" height="46"/>
+        <circle cx="220" cy="27" r="2"/>
+        <circle cx="390" cy="30" r="1.6"/>
+        <circle cx="540" cy="26" r="1.8"/>
+      </g>
+    </mask>
+  </defs>
+  <rect width="600" height="60" fill="url(#pigment)" mask="url(#brush)"/>
+</svg>

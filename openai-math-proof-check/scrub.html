@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>逐帧滑块 · AI 的数学稿，Lean 检查了什么？</title>
+<style>
+  :root{--bg:#070b0c;--panel:#0f1515;--line:#26302d;--ink:#f2efe5;--muted:#8f9995;--green:#7fe3a8;--red:#e0523a;--amber:#f2c14e}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:14px/1.5 "PingFang SC","Hiragino Sans GB",sans-serif}
+  body{display:flex;flex-direction:column;gap:12px;padding:16px 18px 20px}
+  header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  header h1{margin:0;font-size:15px;font-weight:700;letter-spacing:.01em}
+  header .meta{color:var(--muted);font-size:12px;font-family:"SF Mono",Menlo,monospace}
+  #stageWrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+  #stage{position:relative;flex:none;background:#000;border:1px solid var(--line);box-shadow:0 20px 60px #000a;overflow:hidden}
+  iframe{position:absolute;left:0;top:0;width:1920px;height:1080px;border:0;transform-origin:0 0;background:#000}
+  .controls{display:flex;flex-direction:column;gap:8px;width:100%;max-width:1520px;margin:0 auto}
+  .row{display:flex;align-items:center;gap:10px}
+  button{appearance:none;border:1px solid #35403c;background:#111817;color:#e9e6dc;border-radius:999px;padding:7px 13px;font-size:12px;cursor:pointer;white-space:nowrap}
+  button:hover{border-color:#5d6a65;color:#fff}
+  button.primary{border-color:#2f6b4b;color:#b9f0cd}
+  #seekWrap{position:relative;flex:1;height:34px;display:flex;align-items:center}
+  #seek{width:100%;accent-color:var(--green);cursor:pointer;position:relative;z-index:2}
+  #ticks{position:absolute;left:8px;right:8px;top:13px;height:8px;pointer-events:none;z-index:3}
+  #ticks i{position:absolute;top:0;width:1px;height:7px;background:#5f6b66;pointer-events:auto;cursor:pointer}
+  #ticks i:hover{background:var(--green);height:9px}
+  #time{font-family:"SF Mono",Menlo,monospace;font-size:14px;color:var(--ink);min-width:144px;text-align:right;cursor:copy}
+  #bubble{position:absolute;bottom:30px;left:0;transform:translateX(-50%);background:#0d1413;border:1px solid #3a4a44;color:var(--green);font:12px/1 "SF Mono",Menlo,monospace;padding:5px 8px;border-radius:4px;pointer-events:none;opacity:0;transition:opacity .12s;z-index:6;white-space:nowrap}
+  #bubble.show{opacity:1}
+  #cueBox{border-top:1px solid var(--line);padding-top:9px;display:flex;gap:14px;align-items:baseline;max-width:1520px;width:100%;margin:0 auto}
+  #cueNo{font-family:"SF Mono",Menlo,monospace;font-size:11px;color:var(--amber);min-width:58px}
+  #cueRange{font-family:"SF Mono",Menlo,monospace;font-size:11px;color:var(--muted);min-width:108px}
+  details#cueList{width:100%;max-width:1520px;margin:0 auto;border-top:1px solid var(--line);padding-top:7px}
+  details#cueList summary{cursor:pointer;color:var(--muted);font-size:12px;user-select:none}
+  details#cueList summary:hover{color:var(--ink)}
+  #cueGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1px 14px;max-height:128px;overflow:auto;margin-top:6px}
+  .cue{display:flex;gap:9px;align-items:baseline;width:100%;text-align:left;border:0;background:none;border-radius:4px;padding:3px 5px;color:var(--muted);font:11px/1.5 "PingFang SC",sans-serif;cursor:pointer;overflow:hidden}
+  .cue:hover{background:#141d1b;color:var(--ink)}
+  .cue b{font:500 11px/1.5 "SF Mono",Menlo,monospace;color:var(--amber);min-width:76px}
+  .cue span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cue.is-on{background:#15221e;color:var(--ink)}
+  .cue.is-on b{color:var(--green)}
+  #cueText{font-size:15px;color:#e8e4d8}
+  .hint{color:var(--muted);font-size:11px}
+  @media (max-width:760px){body{padding:10px}.hint{display:none}#time{min-width:96px}button{padding:6px 9px;font-size:11px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>逐帧滑块 · AI 的数学稿，Lean 检查了什么？</h1>
+  <span class="meta">1920×1080 · 27 cues · 107.4s · 视频段用代表帧</span>
+</header>
+
+<div id="stageWrap">
+  <div id="stage">
+    <iframe id="film" src="film.html?shot&review&still" title="film"></iframe>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="row">
+    <button id="play" class="primary">播放</button>
+    <button id="prev">上一句</button>
+    <button id="next">下一句</button>
+    <div id="seekWrap">
+      <div id="ticks"></div>
+      <input id="seek" type="range" min="0" max="107.4" step="0.01" value="0">
+      <div id="bubble">00:00.0</div>
+    </div>
+    <span id="time">00:00.0 / 01:47.4</span>
+    <button id="png">存当前帧</button>
+  </div>
+  <div id="cueBox">
+    <span id="cueNo">CUE 00</span>
+    <span id="cueRange">0.0–0.0s</span>
+    <span id="cueText">正在载入…</span>
+    <span class="hint">←/→ 1 帧 · Shift+←/→ 1 秒 · 空格 播放 · 视频段用代表帧</span>
+  </div>
+  <details id="cueList" open>
+    <summary>全部 27 句 · 点秒数跳转</summary>
+    <div id="cueGrid"></div>
+  </details>
+</div>
+
+<script src="timeline.js"></script>
+<script>
+const iframe=document.getElementById('film');
+const seek=document.getElementById('seek');
+const timeEl=document.getElementById('time');
+const cueNo=document.getElementById('cueNo');
+const cueText=document.getElementById('cueText');
+const cueRange=document.getElementById('cueRange');
+const bubble=document.getElementById('bubble');
+const cueGrid=document.getElementById('cueGrid');
+const ticks=document.getElementById('ticks');
+const btnPlay=document.getElementById('play');
+timeEl.addEventListener('click',()=>{navigator.clipboard&&navigator.clipboard.writeText(fmt(+seek.value))});
+const DUR=window.__DUR||107.4;
+let cueNodes=[];
+let ready=false, dragging=false, lastT=0;
+
+const fmt=t=>{t=Math.max(0,t);const m=Math.floor(t/60),s=t-m*60;return `${String(m).padStart(2,'0')}:${s.toFixed(1).padStart(4,'0')}`};
+const clamp=(x,a=0,b=DUR)=>Math.min(b,Math.max(a,x));
+
+function film(){return iframe.contentWindow}
+function cueAt(t){let i=0;while(i<CUES.length-1&&t>=CUES[i+1].start)i++;return i}
+
+// full cue list
+cueNodes=CUES.map((c,i)=>{
+  const b=document.createElement('button');
+  b.className='cue';
+  b.title=`${c.start.toFixed(2)}–${c.end.toFixed(2)}s`;
+  b.innerHTML=`<b>${fmt(c.start)}</b><span>${c.text}</span>`;
+  b.addEventListener('click',()=>jump(c.start+0.001));
+  cueGrid.appendChild(b);
+  return b;
+});
+
+// cue ticks
+CUES.forEach((c,i)=>{
+  const el=document.createElement('i');
+  el.style.left=`${(c.start/DUR)*100}%`;
+  el.title=`${i}. ${c.text}`;
+  el.addEventListener('click',()=>jump(c.start+0.001));
+  ticks.appendChild(el);
+});
+
+function paintUI(t){
+  t=clamp(t);
+  seek.value=t;
+  timeEl.textContent=`${fmt(t)} / ${fmt(DUR)}`;
+  timeEl.title='点击复制当前时间码';
+  const i=cueAt(t);
+  cueNo.textContent=`CUE ${String(i).padStart(2,'0')}`;
+  cueRange.textContent=`${CUES[i].start.toFixed(1)}–${CUES[i].end.toFixed(1)}s`;
+  cueText.textContent=CUES[i].text;
+  cueNodes.forEach((n,k)=>n.classList.toggle('is-on',k===i));
+  btnPlay.textContent=film()&&film().filmPlaying&&film().filmPlaying()?'暂停':'播放';
+}
+
+let pending=null, seeking=false;
+function schedule(t){
+  pending=t;
+  if(seeking)return;
+  runPending();
+}
+async function runPending(){
+  if(pending==null)return;
+  const t=pending;pending=null;seeking=true;
+  try{await film().seek(t);lastT=t;paintUI(t);}catch(e){console.warn(e)}
+  seeking=false;
+  if(pending!=null)runPending();
+}
+function jump(t){t=clamp(t);schedule(t)}
+
+async function waitReady(){
+  for(let i=0;i<240;i++){
+    const w=film();
+    if(w&&w.__READY){ready=true;return true}
+    await new Promise(r=>setTimeout(r,100));
+  }
+  return false;
+}
+
+let bubbleTimer=0;
+function showBubble(t){
+  bubble.textContent=fmt(t);
+  bubble.style.left=`calc(8px + (100% - 16px) * ${clamp(t)/DUR})`;
+  bubble.classList.add('show');
+  clearTimeout(bubbleTimer);
+}
+function hideBubbleSoon(){clearTimeout(bubbleTimer);bubbleTimer=setTimeout(()=>bubble.classList.remove('show'),650)}
+seek.addEventListener('input',()=>{dragging=true;const t=+seek.value;showBubble(t);jump(t);});
+seek.addEventListener('change',()=>{dragging=false;hideBubbleSoon();});
+seek.addEventListener('pointerup',hideBubbleSoon);
+seek.addEventListener('pointercancel',hideBubbleSoon);
+
+btnPlay.addEventListener('click',async()=>{
+  if(!ready)return;
+  const w=film();
+  if(w.filmPlaying()){w.pauseFilm();paintUI(w.filmNow());return}
+  await w.playFilm(+seek.value);
+  btnPlay.textContent='暂停';
+});
+
+document.getElementById('prev').addEventListener('click',()=>{
+  const t=+seek.value,i=cueAt(t);
+  jump(i>0?CUES[i-1].start+0.001:0);
+});
+document.getElementById('next').addEventListener('click',()=>{
+  const t=+seek.value,i=cueAt(t);
+  jump(i<CUES.length-1?CUES[i+1].start+0.001:DUR-0.05);
+});
+
+document.getElementById('png').addEventListener('click',()=>{
+  const w=film();if(!w)return;
+  try{
+    const c=w.document.getElementById('film');
+    const a=document.createElement('a');
+    a.href=c.toDataURL('image/png');
+    a.download=`frame-${(+seek.value).toFixed(2)}.png`;
+    a.click();
+  }catch(e){alert('当前浏览器不允许导出该帧：'+e.message)}
+});
+
+window.addEventListener('keydown',async e=>{
+  if(e.code==='Space'){e.preventDefault();btnPlay.click();return}
+  if(!ready)return;
+  if(e.code==='ArrowLeft'||e.code==='ArrowRight'){
+    e.preventDefault();
+    const d=(e.shiftKey?1:1/24)*(e.code==='ArrowRight'?1:-1);
+    jump(clamp(+seek.value+d));
+  }
+});
+
+function fit(){
+  const host=document.getElementById('stageWrap'),stage=document.getElementById('stage');
+  const s=Math.min(host.clientWidth/1920,host.clientHeight/1080);
+  stage.style.width=`${Math.round(1920*s)}px`;
+  stage.style.height=`${Math.round(1080*s)}px`;
+  iframe.style.transform=`scale(${s})`;
+}
+window.addEventListener('resize',fit);
+if(window.ResizeObserver)new ResizeObserver(fit).observe(document.getElementById('stageWrap'));
+fit();
+
+(async()=>{
+  if(location.protocol==='file:'){
+    cueText.textContent='请用 http:// 打开：在项目目录运行 python3 -m http.server 8931，再访问 /scrub.html';
+    return;
+  }
+  const ok=await waitReady();
+  if(!ok){cueText.textContent='载入超时：确认 film.html 和 assets 在同一目录，并用 http:// 打开';return}
+
+  const q=new URLSearchParams(location.search);
+  const t=q.has('t')?+q.get('t'):0;
+  await film().seek(t);paintUI(t);
+  setInterval(()=>{
+    if(!ready||dragging)return;
+    const w=film();
+    if(w.filmPlaying()){const t=w.filmNow();lastT=t;seek.value=t;paintUI(t);}
+  },120);
+})();
+</script>
+</body>
+</html>
